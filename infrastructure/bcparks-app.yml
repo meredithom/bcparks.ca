@@ -28,7 +28,7 @@ parameters:
   value: cms
 - name: API_POD
   required: true
-  value: middle-ware
+  value: middleware
 - name: API_URL
   required: true
   value: api
@@ -48,7 +48,7 @@ parameters:
 - name: WEB_SCHEMA
   value: http
 - name: URL_STUB
-  value: "-61d198-dev.apps.silver.devops.gov.bc.ca"
+  value: "-61d198-tools.apps.silver.devops.gov.bc.ca" # full url after adding API_URL https://api-61d198-tools.apps.silver.devops.gov.bc.ca
   required: false
 
 objects:
