@@ -28,10 +28,8 @@ parameters:
   value: cms
 - name: API_POD
   required: true
-  value: middleware
 - name: API_URL
   required: true
-  value: api
 - name: ASP_ENV
   value: Development
   required: true
@@ -50,6 +48,8 @@ parameters:
 - name: URL_STUB
   value: "-61d198-tools.apps.silver.devops.gov.bc.ca" # full url after adding API_URL https://api-61d198-tools.apps.silver.devops.gov.bc.ca
   required: false
+- name: API_HOST_PREFIX
+  value: api
 
 objects:
 ### Frontend
@@ -533,10 +533,10 @@ objects:
     app.kubernetes.io/instance: ${NAME}
     app.kubernetes.io/part-of: ${NAME}
   metadata:
-    name: ${API_POD}
+    name: ${API_POD}-route
     namespace: ${OC_NAMESPACE}-${OC_APP}
   spec:
-    host: ${API_URL}${URL_STUB}
+    host: ${API_HOST_PREFIX}${URL_STUB}
     to:
       kind: Service
       name: ${API_POD}
