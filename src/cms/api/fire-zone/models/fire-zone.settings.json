@@ -24,9 +24,10 @@
       "via": "fireZones",
       "model": "fire-centre"
     },
-    "protectedArea": {
+    "protectedAreas": {
       "via": "fireZones",
-      "model": "protected-area"
+      "collection": "protected-area",
+      "dominant": true
     }
   }
 }

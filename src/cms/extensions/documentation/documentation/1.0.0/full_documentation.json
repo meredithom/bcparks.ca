@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "06/14/2021 8:57:17 AM"
+    "x-generation-date": "06/29/2021 7:56:47 AM"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -6424,7 +6424,7 @@
         "parameters": []
       }
     },
-    "/management-areas/{ManagementAreaNumber}": {
+    "/management-areas/{managementAreaNumber}": {
       "get": {
         "deprecated": false,
         "description": "",
@@ -6480,7 +6480,7 @@
         ],
         "parameters": [
           {
-            "name": "ManagementAreaNumber",
+            "name": "managementAreaNumber",
             "in": "path",
             "description": "",
             "deprecated": false,
@@ -6490,7 +6490,9 @@
             }
           }
         ]
-      },
+      }
+    },
+    "/management-areas/{id}": {
       "put": {
         "deprecated": false,
         "description": "Update a record",
@@ -6557,7 +6559,7 @@
         },
         "parameters": [
           {
-            "name": "ManagementAreaNumber",
+            "name": "id",
             "in": "path",
             "description": "",
             "deprecated": false,
@@ -6620,7 +6622,7 @@
         ],
         "parameters": [
           {
-            "name": "ManagementAreaNumber",
+            "name": "id",
             "in": "path",
             "description": "",
             "deprecated": false,
@@ -9281,7 +9283,9 @@
             }
           }
         ]
-      },
+      }
+    },
+    "/protected-areas/{id}": {
       "put": {
         "deprecated": false,
         "description": "Update a record",
@@ -9348,7 +9352,7 @@
         },
         "parameters": [
           {
-            "name": "orcs",
+            "name": "id",
             "in": "path",
             "description": "",
             "deprecated": false,
@@ -9411,7 +9415,7 @@
         ],
         "parameters": [
           {
-            "name": "orcs",
+            "name": "id",
             "in": "path",
             "description": "",
             "deprecated": false,
@@ -10258,7 +10262,7 @@
         "parameters": []
       }
     },
-    "/regions/{RegionNumber}": {
+    "/regions/{regionNumber}": {
       "get": {
         "deprecated": false,
         "description": "",
@@ -10310,7 +10314,7 @@
         ],
         "parameters": [
           {
-            "name": "RegionNumber",
+            "name": "regionNumber",
             "in": "path",
             "description": "",
             "deprecated": false,
@@ -10320,7 +10324,9 @@
             }
           }
         ]
-      },
+      }
+    },
+    "/regions/{id}": {
       "put": {
         "deprecated": false,
         "description": "Update a record",
@@ -10383,7 +10389,7 @@
         },
         "parameters": [
           {
-            "name": "RegionNumber",
+            "name": "id",
             "in": "path",
             "description": "",
             "deprecated": false,
@@ -10446,7 +10452,7 @@
         ],
         "parameters": [
           {
-            "name": "RegionNumber",
+            "name": "id",
             "in": "path",
             "description": "",
             "deprecated": false,
@@ -10769,7 +10775,7 @@
         "parameters": []
       }
     },
-    "/sections/{SectionNumber}": {
+    "/sections/{sectionNumber}": {
       "get": {
         "deprecated": false,
         "description": "",
@@ -10821,7 +10827,7 @@
         ],
         "parameters": [
           {
-            "name": "SectionNumber",
+            "name": "sectionNumber",
             "in": "path",
             "description": "",
             "deprecated": false,
@@ -10831,7 +10837,9 @@
             }
           }
         ]
-      },
+      }
+    },
+    "/sections/{id}": {
       "put": {
         "deprecated": false,
         "description": "Update a record",
@@ -10894,7 +10902,7 @@
         },
         "parameters": [
           {
-            "name": "SectionNumber",
+            "name": "id",
             "in": "path",
             "description": "",
             "deprecated": false,
@@ -10957,7 +10965,7 @@
         ],
         "parameters": [
           {
-            "name": "SectionNumber",
+            "name": "id",
             "in": "path",
             "description": "",
             "deprecated": false,
@@ -11342,7 +11350,9 @@
             }
           }
         ]
-      },
+      }
+    },
+    "/sites/{id}": {
       "put": {
         "deprecated": false,
         "description": "Update a record",
@@ -11405,7 +11415,7 @@
         },
         "parameters": [
           {
-            "name": "orcsSiteNumber",
+            "name": "id",
             "in": "path",
             "description": "",
             "deprecated": false,
@@ -11468,7 +11478,7 @@
         ],
         "parameters": [
           {
-            "name": "orcsSiteNumber",
+            "name": "id",
             "in": "path",
             "description": "",
             "deprecated": false,
@@ -12799,6 +12809,517 @@
         "summary": "",
         "tags": [
           "Urgency"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "deprecated": false,
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/websites": {
+      "get": {
+        "deprecated": false,
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Website"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "Website"
+        ],
+        "parameters": [
+          {
+            "name": "_limit",
+            "in": "query",
+            "required": false,
+            "description": "Maximum number of results possible",
+            "schema": {
+              "type": "integer"
+            },
+            "deprecated": false
+          },
+          {
+            "name": "_sort",
+            "in": "query",
+            "required": false,
+            "description": "Sort according to a specific field.",
+            "schema": {
+              "type": "string"
+            },
+            "deprecated": false
+          },
+          {
+            "name": "_start",
+            "in": "query",
+            "required": false,
+            "description": "Skip a specific number of entries (especially useful for pagination)",
+            "schema": {
+              "type": "integer"
+            },
+            "deprecated": false
+          },
+          {
+            "name": "=",
+            "in": "query",
+            "required": false,
+            "description": "Get entries that matches exactly your input",
+            "schema": {
+              "type": "string"
+            },
+            "deprecated": false
+          },
+          {
+            "name": "_ne",
+            "in": "query",
+            "required": false,
+            "description": "Get records that are not equals to something",
+            "schema": {
+              "type": "string"
+            },
+            "deprecated": false
+          },
+          {
+            "name": "_lt",
+            "in": "query",
+            "required": false,
+            "description": "Get record that are lower than a value",
+            "schema": {
+              "type": "string"
+            },
+            "deprecated": false
+          },
+          {
+            "name": "_lte",
+            "in": "query",
+            "required": false,
+            "description": "Get records that are lower than or equal to a value",
+            "schema": {
+              "type": "string"
+            },
+            "deprecated": false
+          },
+          {
+            "name": "_gt",
+            "in": "query",
+            "required": false,
+            "description": "Get records that are greater than a value",
+            "schema": {
+              "type": "string"
+            },
+            "deprecated": false
+          },
+          {
+            "name": "_gte",
+            "in": "query",
+            "required": false,
+            "description": "Get records that are greater than  or equal a value",
+            "schema": {
+              "type": "string"
+            },
+            "deprecated": false
+          },
+          {
+            "name": "_contains",
+            "in": "query",
+            "required": false,
+            "description": "Get records that contains a value",
+            "schema": {
+              "type": "string"
+            },
+            "deprecated": false
+          },
+          {
+            "name": "_containss",
+            "in": "query",
+            "required": false,
+            "description": "Get records that contains (case sensitive) a value",
+            "schema": {
+              "type": "string"
+            },
+            "deprecated": false
+          },
+          {
+            "name": "_in",
+            "in": "query",
+            "required": false,
+            "description": "Get records that matches any value in the array of values",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "deprecated": false
+          },
+          {
+            "name": "_nin",
+            "in": "query",
+            "required": false,
+            "description": "Get records that doesn't match any value in the array of values",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "deprecated": false
+          }
+        ]
+      },
+      "post": {
+        "deprecated": false,
+        "description": "Create a new record",
+        "responses": {
+          "200": {
+            "description": "response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Website"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "Website"
+        ],
+        "requestBody": {
+          "description": "",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewWebsite"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/websites/count": {
+      "get": {
+        "deprecated": false,
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "Website"
+        ],
+        "parameters": []
+      }
+    },
+    "/websites/{id}": {
+      "get": {
+        "deprecated": false,
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Website"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "Website"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "deprecated": false,
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "put": {
+        "deprecated": false,
+        "description": "Update a record",
+        "responses": {
+          "200": {
+            "description": "response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Website"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "Website"
+        ],
+        "requestBody": {
+          "description": "",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewWebsite"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "deprecated": false,
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "deprecated": false,
+        "description": "Delete a record",
+        "responses": {
+          "200": {
+            "description": "deletes a single record based on the ID supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "Website"
         ],
         "parameters": [
           {
@@ -16051,8 +16572,11 @@
               "fireCentre": {
                 "type": "string"
               },
-              "protectedArea": {
-                "type": "string"
+              "protectedAreas": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
               },
               "published_at": {
                 "type": "string"
@@ -16140,8 +16664,11 @@
                 "fireCentre": {
                   "type": "string"
                 },
-                "protectedArea": {
-                  "type": "string"
+                "protectedAreas": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 },
                 "published_at": {
                   "type": "string"
@@ -16235,129 +16762,141 @@
               }
             }
           },
-          "protectedArea": {
-            "required": [
-              "id",
-              "orcs"
-            ],
-            "properties": {
-              "id": {
-                "type": "string"
-              },
-              "orcs": {
-                "type": "integer"
-              },
-              "protectedAreaName": {
-                "type": "string"
-              },
-              "totalArea": {
-                "type": "number"
-              },
-              "uplandArea": {
-                "type": "number"
-              },
-              "marineArea": {
-                "type": "number"
-              },
-              "marineProtectedArea": {
-                "type": "string"
-              },
-              "type": {
-                "type": "string"
-              },
-              "class": {
-                "type": "string"
-              },
-              "establishedDate": {
-                "type": "string"
-              },
-              "repealedDate": {
-                "type": "string"
-              },
-              "status": {
-                "type": "string"
-              },
-              "url": {
-                "type": "string"
-              },
-              "typeCode": {
-                "type": "string",
-                "enum": [
-                  "PK",
-                  "PA",
-                  "RA",
-                  "ER",
-                  "CS"
-                ]
-              },
-              "latitude": {
-                "type": "number"
-              },
-              "longitude": {
-                "type": "number"
-              },
-              "mapZoom": {
-                "type": "integer"
-              },
-              "isDayUsePass": {
-                "type": "boolean"
-              },
-              "isFogZone": {
-                "type": "boolean"
-              },
-              "featureId": {
-                "type": "integer"
-              },
-              "managementAreas": {
-                "type": "array",
-                "items": {
+          "protectedAreas": {
+            "type": "array",
+            "items": {
+              "required": [
+                "id",
+                "orcs"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "orcs": {
+                  "type": "integer"
+                },
+                "protectedAreaName": {
+                  "type": "string"
+                },
+                "totalArea": {
+                  "type": "number"
+                },
+                "uplandArea": {
+                  "type": "number"
+                },
+                "marineArea": {
+                  "type": "number"
+                },
+                "marineProtectedArea": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "class": {
+                  "type": "string"
+                },
+                "establishedDate": {
+                  "type": "string"
+                },
+                "repealedDate": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "typeCode": {
+                  "type": "string",
+                  "enum": [
+                    "PK",
+                    "PA",
+                    "RA",
+                    "ER",
+                    "CS"
+                  ]
+                },
+                "latitude": {
+                  "type": "number"
+                },
+                "longitude": {
+                  "type": "number"
+                },
+                "mapZoom": {
+                  "type": "integer"
+                },
+                "isDayUsePass": {
+                  "type": "boolean"
+                },
+                "isFogZone": {
+                  "type": "boolean"
+                },
+                "featureId": {
+                  "type": "integer"
+                },
+                "sites": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "parkActivities": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "parkFacilities": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "parkNames": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "hasCampfireBan": {
+                  "type": "boolean"
+                },
+                "hasSmokingBan": {
+                  "type": "boolean"
+                },
+                "fireZones": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "managementAreas": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "hasCampfireBanOverride": {
+                  "type": "boolean"
+                },
+                "hasSmokingBanOverride": {
+                  "type": "boolean"
+                },
+                "campfireBanRescindedDate": {
+                  "type": "string"
+                },
+                "published_at": {
+                  "type": "string"
+                },
+                "created_by": {
+                  "type": "string"
+                },
+                "updated_by": {
                   "type": "string"
                 }
-              },
-              "sites": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "fireZones": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "parkActivities": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "parkFacilities": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "parkNames": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "hasCampfireBan": {
-                "type": "boolean"
-              },
-              "hasSmokingBan": {
-                "type": "boolean"
-              },
-              "published_at": {
-                "type": "string"
-              },
-              "created_by": {
-                "type": "string"
-              },
-              "updated_by": {
-                "type": "string"
               }
             }
           },
@@ -16381,8 +16920,11 @@
           "fireCentre": {
             "type": "string"
           },
-          "protectedArea": {
-            "type": "string"
+          "protectedAreas": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "published_at": {
             "type": "string",
@@ -16545,129 +17087,141 @@
               }
             }
           },
-          "protectedArea": {
-            "required": [
-              "id",
-              "orcs"
-            ],
-            "properties": {
-              "id": {
-                "type": "string"
-              },
-              "orcs": {
-                "type": "integer"
-              },
-              "protectedAreaName": {
-                "type": "string"
-              },
-              "totalArea": {
-                "type": "number"
-              },
-              "uplandArea": {
-                "type": "number"
-              },
-              "marineArea": {
-                "type": "number"
-              },
-              "marineProtectedArea": {
-                "type": "string"
-              },
-              "type": {
-                "type": "string"
-              },
-              "class": {
-                "type": "string"
-              },
-              "establishedDate": {
-                "type": "string"
-              },
-              "repealedDate": {
-                "type": "string"
-              },
-              "status": {
-                "type": "string"
-              },
-              "url": {
-                "type": "string"
-              },
-              "typeCode": {
-                "type": "string",
-                "enum": [
-                  "PK",
-                  "PA",
-                  "RA",
-                  "ER",
-                  "CS"
-                ]
-              },
-              "latitude": {
-                "type": "number"
-              },
-              "longitude": {
-                "type": "number"
-              },
-              "mapZoom": {
-                "type": "integer"
-              },
-              "isDayUsePass": {
-                "type": "boolean"
-              },
-              "isFogZone": {
-                "type": "boolean"
-              },
-              "featureId": {
-                "type": "integer"
-              },
-              "managementAreas": {
-                "type": "array",
-                "items": {
+          "protectedAreas": {
+            "type": "array",
+            "items": {
+              "required": [
+                "id",
+                "orcs"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "orcs": {
+                  "type": "integer"
+                },
+                "protectedAreaName": {
+                  "type": "string"
+                },
+                "totalArea": {
+                  "type": "number"
+                },
+                "uplandArea": {
+                  "type": "number"
+                },
+                "marineArea": {
+                  "type": "number"
+                },
+                "marineProtectedArea": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "class": {
+                  "type": "string"
+                },
+                "establishedDate": {
+                  "type": "string"
+                },
+                "repealedDate": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "typeCode": {
+                  "type": "string",
+                  "enum": [
+                    "PK",
+                    "PA",
+                    "RA",
+                    "ER",
+                    "CS"
+                  ]
+                },
+                "latitude": {
+                  "type": "number"
+                },
+                "longitude": {
+                  "type": "number"
+                },
+                "mapZoom": {
+                  "type": "integer"
+                },
+                "isDayUsePass": {
+                  "type": "boolean"
+                },
+                "isFogZone": {
+                  "type": "boolean"
+                },
+                "featureId": {
+                  "type": "integer"
+                },
+                "sites": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "parkActivities": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "parkFacilities": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "parkNames": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "hasCampfireBan": {
+                  "type": "boolean"
+                },
+                "hasSmokingBan": {
+                  "type": "boolean"
+                },
+                "fireZones": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "managementAreas": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "hasCampfireBanOverride": {
+                  "type": "boolean"
+                },
+                "hasSmokingBanOverride": {
+                  "type": "boolean"
+                },
+                "campfireBanRescindedDate": {
+                  "type": "string"
+                },
+                "published_at": {
+                  "type": "string"
+                },
+                "created_by": {
+                  "type": "string"
+                },
+                "updated_by": {
                   "type": "string"
                 }
-              },
-              "sites": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "fireZones": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "parkActivities": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "parkFacilities": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "parkNames": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "hasCampfireBan": {
-                "type": "boolean"
-              },
-              "hasSmokingBan": {
-                "type": "boolean"
-              },
-              "published_at": {
-                "type": "string"
-              },
-              "created_by": {
-                "type": "string"
-              },
-              "updated_by": {
-                "type": "string"
               }
             }
           },
@@ -16729,8 +17283,11 @@
           "section": {
             "type": "string"
           },
-          "protectedArea": {
-            "type": "string"
+          "protectedAreas": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "region": {
             "type": "string"
@@ -16840,19 +17397,7 @@
               "featureId": {
                 "type": "integer"
               },
-              "managementAreas": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
               "sites": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "fireZones": {
                 "type": "array",
                 "items": {
                   "type": "string"
@@ -16881,6 +17426,27 @@
               },
               "hasSmokingBan": {
                 "type": "boolean"
+              },
+              "fireZones": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "managementAreas": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "hasCampfireBanOverride": {
+                "type": "boolean"
+              },
+              "hasSmokingBanOverride": {
+                "type": "boolean"
+              },
+              "campfireBanRescindedDate": {
+                "type": "string"
               },
               "published_at": {
                 "type": "string"
@@ -17135,19 +17701,7 @@
               "featureId": {
                 "type": "integer"
               },
-              "managementAreas": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
               "sites": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "fireZones": {
                 "type": "array",
                 "items": {
                   "type": "string"
@@ -17176,6 +17730,27 @@
               },
               "hasSmokingBan": {
                 "type": "boolean"
+              },
+              "fireZones": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "managementAreas": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "hasCampfireBanOverride": {
+                "type": "boolean"
+              },
+              "hasSmokingBanOverride": {
+                "type": "boolean"
+              },
+              "campfireBanRescindedDate": {
+                "type": "string"
               },
               "published_at": {
                 "type": "string"
@@ -17501,19 +18076,7 @@
               "featureId": {
                 "type": "integer"
               },
-              "managementAreas": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
               "sites": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "fireZones": {
                 "type": "array",
                 "items": {
                   "type": "string"
@@ -17542,6 +18105,27 @@
               },
               "hasSmokingBan": {
                 "type": "boolean"
+              },
+              "fireZones": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "managementAreas": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "hasCampfireBanOverride": {
+                "type": "boolean"
+              },
+              "hasSmokingBanOverride": {
+                "type": "boolean"
+              },
+              "campfireBanRescindedDate": {
+                "type": "string"
               },
               "published_at": {
                 "type": "string"
@@ -17666,44 +18250,6 @@
           "featureId": {
             "type": "integer"
           },
-          "managementAreas": {
-            "type": "array",
-            "items": {
-              "required": [
-                "id",
-                "managementAreaNumber"
-              ],
-              "properties": {
-                "id": {
-                  "type": "string"
-                },
-                "managementAreaNumber": {
-                  "type": "integer"
-                },
-                "managementAreaName": {
-                  "type": "string"
-                },
-                "section": {
-                  "type": "string"
-                },
-                "protectedArea": {
-                  "type": "string"
-                },
-                "region": {
-                  "type": "string"
-                },
-                "published_at": {
-                  "type": "string"
-                },
-                "created_by": {
-                  "type": "string"
-                },
-                "updated_by": {
-                  "type": "string"
-                }
-              }
-            }
-          },
           "sites": {
             "type": "array",
             "items": {
@@ -17759,43 +18305,6 @@
                   "items": {
                     "type": "string"
                   }
-                },
-                "published_at": {
-                  "type": "string"
-                },
-                "created_by": {
-                  "type": "string"
-                },
-                "updated_by": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "fireZones": {
-            "type": "array",
-            "items": {
-              "required": [
-                "id"
-              ],
-              "properties": {
-                "id": {
-                  "type": "string"
-                },
-                "fireZoneNumber": {
-                  "type": "integer"
-                },
-                "fireZoneName": {
-                  "type": "string"
-                },
-                "headquartersCityName": {
-                  "type": "string"
-                },
-                "fireCentre": {
-                  "type": "string"
-                },
-                "protectedArea": {
-                  "type": "string"
                 },
                 "published_at": {
                   "type": "string"
@@ -17938,6 +18447,97 @@
           "hasSmokingBan": {
             "type": "boolean"
           },
+          "fireZones": {
+            "type": "array",
+            "items": {
+              "required": [
+                "id"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "fireZoneNumber": {
+                  "type": "integer"
+                },
+                "fireZoneName": {
+                  "type": "string"
+                },
+                "headquartersCityName": {
+                  "type": "string"
+                },
+                "fireCentre": {
+                  "type": "string"
+                },
+                "protectedAreas": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "published_at": {
+                  "type": "string"
+                },
+                "created_by": {
+                  "type": "string"
+                },
+                "updated_by": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "managementAreas": {
+            "type": "array",
+            "items": {
+              "required": [
+                "id",
+                "managementAreaNumber"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "managementAreaNumber": {
+                  "type": "integer"
+                },
+                "managementAreaName": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "protectedAreas": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "region": {
+                  "type": "string"
+                },
+                "published_at": {
+                  "type": "string"
+                },
+                "created_by": {
+                  "type": "string"
+                },
+                "updated_by": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "hasCampfireBanOverride": {
+            "type": "boolean"
+          },
+          "hasSmokingBanOverride": {
+            "type": "boolean"
+          },
+          "campfireBanRescindedDate": {
+            "type": "string",
+            "format": "date"
+          },
           "published_at": {
             "type": "string",
             "format": "date-time"
@@ -18017,19 +18617,7 @@
           "featureId": {
             "type": "integer"
           },
-          "managementAreas": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
           "sites": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "fireZones": {
             "type": "array",
             "items": {
               "type": "string"
@@ -18058,6 +18646,28 @@
           },
           "hasSmokingBan": {
             "type": "boolean"
+          },
+          "fireZones": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "managementAreas": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hasCampfireBanOverride": {
+            "type": "boolean"
+          },
+          "hasSmokingBanOverride": {
+            "type": "boolean"
+          },
+          "campfireBanRescindedDate": {
+            "type": "string",
+            "format": "date"
           },
           "published_at": {
             "type": "string",
@@ -18340,19 +18950,7 @@
                 "featureId": {
                   "type": "integer"
                 },
-                "managementAreas": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
                 "sites": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "fireZones": {
                   "type": "array",
                   "items": {
                     "type": "string"
@@ -18381,6 +18979,27 @@
                 },
                 "hasSmokingBan": {
                   "type": "boolean"
+                },
+                "fireZones": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "managementAreas": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "hasCampfireBanOverride": {
+                  "type": "boolean"
+                },
+                "hasSmokingBanOverride": {
+                  "type": "boolean"
+                },
+                "campfireBanRescindedDate": {
+                  "type": "string"
                 },
                 "published_at": {
                   "type": "string"
@@ -18524,8 +19143,11 @@
                 "section": {
                   "type": "string"
                 },
-                "protectedArea": {
-                  "type": "string"
+                "protectedAreas": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 },
                 "region": {
                   "type": "string"
@@ -18564,8 +19186,11 @@
                 "fireCentre": {
                   "type": "string"
                 },
-                "protectedArea": {
-                  "type": "string"
+                "protectedAreas": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 },
                 "published_at": {
                   "type": "string"
@@ -18920,8 +19545,11 @@
                 "section": {
                   "type": "string"
                 },
-                "protectedArea": {
-                  "type": "string"
+                "protectedAreas": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 },
                 "region": {
                   "type": "string"
@@ -19052,8 +19680,11 @@
                 "section": {
                   "type": "string"
                 },
-                "protectedArea": {
-                  "type": "string"
+                "protectedAreas": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 },
                 "region": {
                   "type": "string"
@@ -19222,19 +19853,7 @@
               "featureId": {
                 "type": "integer"
               },
-              "managementAreas": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
               "sites": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "fireZones": {
                 "type": "array",
                 "items": {
                   "type": "string"
@@ -19263,6 +19882,27 @@
               },
               "hasSmokingBan": {
                 "type": "boolean"
+              },
+              "fireZones": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "managementAreas": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "hasCampfireBanOverride": {
+                "type": "boolean"
+              },
+              "hasSmokingBanOverride": {
+                "type": "boolean"
+              },
+              "campfireBanRescindedDate": {
+                "type": "string"
               },
               "published_at": {
                 "type": "string"
@@ -19584,6 +20224,202 @@
           },
           "sequence": {
             "type": "integer"
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "updated_by": {
+            "type": "string"
+          }
+        }
+      },
+      "Website": {
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "pageName": {
+            "type": "string"
+          },
+          "header": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "properties": {
+                    "__component": {
+                      "type": "string",
+                      "enum": [
+                        "page.header"
+                      ]
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "content": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                }
+              ]
+            }
+          },
+          "body": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "properties": {
+                    "__component": {
+                      "type": "string",
+                      "enum": [
+                        "page.body"
+                      ]
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "content": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                }
+              ]
+            }
+          },
+          "footer": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "properties": {
+                    "__component": {
+                      "type": "string",
+                      "enum": [
+                        "page.footer"
+                      ]
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "content": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                }
+              ]
+            }
+          },
+          "content": {
+            "type": "string"
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "NewWebsite": {
+        "properties": {
+          "pageName": {
+            "type": "string"
+          },
+          "header": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "properties": {
+                    "__component": {
+                      "type": "string",
+                      "enum": [
+                        "page.header"
+                      ]
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "content": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                }
+              ]
+            }
+          },
+          "body": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "properties": {
+                    "__component": {
+                      "type": "string",
+                      "enum": [
+                        "page.body"
+                      ]
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "content": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                }
+              ]
+            }
+          },
+          "footer": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "properties": {
+                    "__component": {
+                      "type": "string",
+                      "enum": [
+                        "page.footer"
+                      ]
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "content": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                }
+              ]
+            }
+          },
+          "content": {
+            "type": "string"
           },
           "published_at": {
             "type": "string",
@@ -19958,6 +20794,9 @@
     },
     {
       "name": "Urgency"
+    },
+    {
+      "name": "Website"
     },
     {
       "name": "Email - Email"

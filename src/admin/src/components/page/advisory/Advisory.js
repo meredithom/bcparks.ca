@@ -8,10 +8,11 @@ import "moment-timezone";
 import { useKeycloak } from "@react-keycloak/web";
 import {
   calculateAfterHours,
-  getAdvisoryFields,
+  getApproverAdvisoryFields,
   getLocationSelection,
-  getUpdateAdvisoryFields,
+  getSubmitterAdvisoryFields,
   calculateIsStatHoliday,
+  removeLocations,
 } from "../../../utils/AdvisoryUtil";
 import AdvisoryForm from "../../composite/advisoryForm/AdvisoryForm";
 import Header from "../../composite/header/Header";
@@ -32,6 +33,7 @@ import {
   getLinkTypes,
   getBusinessHours,
 } from "../../../utils/CmsDataUtil";
+import { hasRole } from "../../../utils/AuthenticationUtils";
 
 export default function Advisory({
   mode,
@@ -41,16 +43,22 @@ export default function Advisory({
   const [selectedProtectedAreas, setSelectedProtectedAreas] = useState([]);
   const [regions, setRegions] = useState([]);
   const [selectedRegions, setSelectedRegions] = useState([]);
+  const [existingRegions, setExistingRegions] = useState([]);
   const [sections, setSections] = useState([]);
   const [selectedSections, setSelectedSections] = useState([]);
+  const [existingSections, setExistingSections] = useState([]);
   const [managementAreas, setManagementAreas] = useState([]);
   const [selectedManagementAreas, setSelectedManagementAreas] = useState([]);
+  const [existingManagementAreas, setExistingManagementAreas] = useState([]);
   const [sites, setSites] = useState([]);
   const [selectedSites, setSelectedSites] = useState([]);
+  const [existingSites, setExistingSites] = useState([]);
   const [fireCentres, setFireCentres] = useState([]);
   const [selectedFireCentres, setSelectedFireCentres] = useState([]);
+  const [existingFireCentres, setExistingFireCentres] = useState([]);
   const [fireZones, setFireZones] = useState([]);
   const [selectedFireZones, setSelectedFireZones] = useState([]);
+  const [existingFireZones, setExistingFireZones] = useState([]);
   const [eventTypes, setEventTypes] = useState([]);
   const [eventType, setEventType] = useState();
   const [accessStatuses, setAccessStatuses] = useState([]);
@@ -102,11 +110,16 @@ export default function Advisory({
   const durationIntervalRef = useRef(0);
   const advisoryDateRef = useRef(moment().tz("America/Vancouver"));
   const [advisoryId, setAdvisoryId] = useState();
+  const [isApprover, setIsApprover] = useState(false);
+  const [formError, setFormError] = useState("");
 
   const { id } = useParams();
 
   useEffect(() => {
     if (initialized && keycloak) {
+      Promise.resolve(getBusinessHours(cmsData, setCmsData)).then((res) => {
+        setIsAfterHours(calculateAfterHours(res));
+      });
       calculateIsStatHoliday(
         setIsStatHoliday,
         cmsData,
@@ -114,7 +127,14 @@ export default function Advisory({
         keycloak.idToken
       );
     }
-  }, [keycloak, initialized, setIsStatHoliday, cmsData, setCmsData]);
+  }, [
+    keycloak,
+    initialized,
+    setIsStatHoliday,
+    setIsAfterHours,
+    cmsData,
+    setCmsData,
+  ]);
 
   useEffect(() => {
     if (mode === "update" && !isLoadingData) {
@@ -217,6 +237,7 @@ export default function Advisory({
                 selRegions.push(regions.find((l) => l.value === r.id));
               });
               setSelectedRegions([...selRegions]);
+              setExistingRegions([...selRegions]);
             }
             if (sectionInfo) {
               const selSections = [];
@@ -224,6 +245,7 @@ export default function Advisory({
                 selSections.push(sections.find((l) => l.value === s.id));
               });
               setSelectedSections([...selSections]);
+              setExistingSections([...selSections]);
             }
             if (managementAreaInfo) {
               const selManagementAreas = [];
@@ -233,6 +255,7 @@ export default function Advisory({
                 );
               });
               setSelectedManagementAreas([...selManagementAreas]);
+              setExistingManagementAreas([...selManagementAreas]);
             }
             if (siteInfo) {
               const selSites = [];
@@ -240,6 +263,7 @@ export default function Advisory({
                 selSites.push(sites.find((l) => l.value === s.id));
               });
               setSelectedSites([...selSites]);
+              setExistingSites([...selSites]);
             }
             if (fireCentreInfo) {
               const selFireCentres = [];
@@ -247,6 +271,7 @@ export default function Advisory({
                 selFireCentres.push(fireCentres.find((l) => l.value === f.id));
               });
               setSelectedFireCentres([...selFireCentres]);
+              setExistingFireCentres([...selFireCentres]);
             }
             if (fireZoneInfo) {
               const selFireZones = [];
@@ -254,6 +279,7 @@ export default function Advisory({
                 selFireZones.push(fireZones.find((l) => l.value === f.id));
               });
               setSelectedFireZones([...selFireZones]);
+              setExistingFireZones([...selFireZones]);
             }
             const links = advisoryData.links;
             if (links) {
@@ -337,6 +363,8 @@ export default function Advisory({
 
   useEffect(() => {
     if (initialized && keycloak) {
+      const approver = hasRole(initialized, keycloak, ["approver"]);
+      setIsApprover(approver);
       Promise.all([
         getProtectedAreas(cmsData, setCmsData),
         getRegions(cmsData, setCmsData),
@@ -348,7 +376,6 @@ export default function Advisory({
         getEventTypes(cmsData, setCmsData),
         getAccessStatuses(cmsData, setCmsData),
         getUrgencies(cmsData, setCmsData),
-        getBusinessHours(cmsData, setCmsData),
         getAdvisoryStatuses(cmsData, setCmsData),
         getLinkTypes(cmsData, setCmsData),
       ])
@@ -413,7 +440,6 @@ export default function Advisory({
             label: et.eventType,
             value: et.id,
           }));
-
           setEventTypes([...eventTypes]);
           const accessStatusData = res[8];
           const accessStatuses = accessStatusData.map((a) => ({
@@ -421,21 +447,38 @@ export default function Advisory({
             value: a.id,
           }));
           setAccessStatuses([...accessStatuses]);
+          const accessStatus = accessStatuses.filter((a) => a.label === "Open");
+          setAccessStatus(accessStatus[0].value);
           const urgencyData = res[9];
           const urgencies = urgencyData.map((u) => ({
             label: u.urgency,
             value: u.id,
           }));
           setUrgencies([...urgencies]);
-          setIsAfterHours(calculateAfterHours(res[10]));
-          const advisoryStatusData = res[11];
-          const advisoryStatuses = advisoryStatusData.map((s) => ({
-            code: s.code,
-            label: s.advisoryStatus,
-            value: s.id,
-          }));
+          const advisoryStatusData = res[10];
+          const restrictedAdvisoryStatusCodes = ["INA", "APR"];
+          const tempAdvisoryStatuses = advisoryStatusData.map((s) => {
+            let result = null;
+            if (restrictedAdvisoryStatusCodes.includes(s.code) && approver) {
+              result = {
+                code: s.code,
+                label: s.advisoryStatus,
+                value: s.id,
+              };
+            } else if (!restrictedAdvisoryStatusCodes.includes(s.code)) {
+              result = {
+                code: s.code,
+                label: s.advisoryStatus,
+                value: s.id,
+              };
+            }
+            return result;
+          });
+          const advisoryStatuses = tempAdvisoryStatuses.filter(
+            (s) => s !== null
+          );
           setAdvisoryStatuses([...advisoryStatuses]);
-          const linkTypeData = res[12];
+          const linkTypeData = res[11];
           const linkTypes = linkTypeData.map((lt) => ({
             label: lt.type,
             value: lt.id,
@@ -484,7 +527,16 @@ export default function Advisory({
     mode,
     cmsData,
     setCmsData,
+    setIsApprover,
   ]);
+
+  const setToBack = () => {
+    if (mode === "create") {
+      setToDashboard(true);
+    } else {
+      setIsConfirmation(true);
+    }
+  };
 
   const onDrop = (picture) => {
     setPictures([...pictures, picture]);
@@ -609,17 +661,36 @@ export default function Advisory({
     return savedLinks;
   };
 
-  const saveAdvisory = (type) => {
-    try {
+  const getAdvisoryFields = (type) => {
+    let publishedDate = null;
+    let adStatus = advisoryStatus;
+    if (isApprover) {
+      setIsSubmitting(true);
+      const status = advisoryStatuses.filter((s) => s.value === advisoryStatus);
+      publishedDate = getApproverAdvisoryFields(
+        status[0]["code"],
+        setConfirmationText
+      );
+    } else {
       if (type === "draft") {
         setIsSavingDraft(true);
       } else if (type === "submit") {
         setIsSubmitting(true);
         if (isAfterHourPublish) type = "publish";
       }
-      const { selAdvisoryStatus, confirmationText, published } =
-        getAdvisoryFields(type, advisoryStatuses);
-      setConfirmationText(confirmationText);
+      const { status, published } = getSubmitterAdvisoryFields(
+        type,
+        advisoryStatuses,
+        setConfirmationText
+      );
+      publishedDate = published;
+      adStatus = status;
+    }
+    return { published: publishedDate, status: adStatus };
+  };
+  const saveAdvisory = (type) => {
+    try {
+      const { published, status } = getAdvisoryFields(type);
       const {
         selProtectedAreas,
         selRegions,
@@ -635,7 +706,9 @@ export default function Advisory({
         selectedManagementAreas,
         selectedSites,
         selectedFireCentres,
-        selectedFireZones
+        selectedFireZones,
+        managementAreas,
+        fireZones
       );
       Promise.resolve(saveLinks()).then((savedLinks) => {
         const newAdvisory = {
@@ -652,11 +725,11 @@ export default function Advisory({
           effectiveDate: startDate,
           endDate: endDate,
           expiryDate: expiryDate,
-          accessStatus: accessStatus,
+          accessStatus: accessStatus ? accessStatus : null,
           eventType: eventType,
           urgency: urgency,
           protectedAreas: selProtectedAreas,
-          advisoryStatus: selAdvisoryStatus,
+          advisoryStatus: status,
           links: savedLinks,
           regions: selRegions,
           sections: selSections,
@@ -701,14 +774,26 @@ export default function Advisory({
     }
   };
 
-  const updateAdvisory = () => {
+  const updateAdvisory = (type) => {
     try {
-      setIsSubmitting(true);
-      const { confirmationText, published } = getUpdateAdvisoryFields(
-        advisoryStatus.Code,
-        isAfterHourPublish
+      const { published, status } = getAdvisoryFields(type);
+      const updatedProtectedAreas = removeLocations(
+        selectedProtectedAreas,
+        selectedRegions,
+        existingRegions,
+        selectedSections,
+        existingSections,
+        selectedManagementAreas,
+        existingManagementAreas,
+        selectedSites,
+        existingSites,
+        selectedFireCentres,
+        existingFireCentres,
+        selectedFireZones,
+        existingFireZones,
+        managementAreas,
+        fireZones
       );
-      setConfirmationText(confirmationText);
       const {
         selProtectedAreas,
         selRegions,
@@ -718,72 +803,82 @@ export default function Advisory({
         selFireCentres,
         selFireZones,
       } = getLocationSelection(
-        selectedProtectedAreas,
+        updatedProtectedAreas,
         selectedRegions,
         selectedSections,
         selectedManagementAreas,
         selectedSites,
         selectedFireCentres,
-        selectedFireZones
+        selectedFireZones,
+        managementAreas,
+        fireZones
       );
-      Promise.resolve(saveLinks()).then((savedLinks) => {
-        const updatedLinks =
-          savedLinks.length > 0 ? [...links, ...savedLinks] : links;
-        const updatedAdvisory = {
-          title: headline,
-          description: description,
-          dcTicketNumber: ticketNumber,
-          isSafetyRelated: isSafetyRelated,
-          listingRank: parseInt(listingRank),
-          note: notes,
-          submittedBy: submittedBy,
-          updatedDate: updatedDate,
-          modifiedDate: moment().toISOString(),
-          modifiedBy: keycloak.tokenParsed.name,
-          advisoryDate: advisoryDate,
-          effectiveDate: startDate,
-          endDate: endDate,
-          expiryDate: expiryDate,
-          accessStatus: accessStatus,
-          eventType: eventType,
-          urgency: urgency,
-          protectedAreas: selProtectedAreas,
-          advisoryStatus: advisoryStatus,
-          links: updatedLinks,
-          regions: selRegions,
-          sections: selSections,
-          managementAreas: selManagementAreas,
-          sites: selSites,
-          fireCentres: selFireCentres,
-          fireZones: selFireZones,
-          isReservationsAffected: isReservationAffected,
-          isAdvisoryDateDisplayed: displayAdvisoryDate,
-          isEffectiveDateDisplayed: displayStartDate,
-          isEndDateDisplayed: displayEndDate,
-          isUpdatedDateDisplayed: displayUpdatedDate,
-          published_at: published,
-          updated_by: keycloak.tokenParsed.name,
-        };
 
-        apiAxios
-          .put(`api/update/public-advisories/${id}`, updatedAdvisory, {
-            headers: { Authorization: `Bearer ${keycloak.idToken}` },
-          })
-          .then((res) => {
-            setAdvisoryId(res.data.id);
-            setIsSubmitting(false);
-            setIsSavingDraft(false);
-            setIsConfirmation(true);
-          })
-          .catch((error) => {
-            console.log("error occurred", error);
-            setToError(true);
-            setError({
-              status: 500,
-              message: "Could not process advisory update",
+      if (!selProtectedAreas || selProtectedAreas.length === 0) {
+        setSelectedProtectedAreas([]);
+        setIsSubmitting(false);
+        setIsSavingDraft(false);
+        setFormError("Please select at least one Location!!");
+      } else {
+        Promise.resolve(saveLinks()).then((savedLinks) => {
+          const updatedLinks =
+            savedLinks.length > 0 ? [...links, ...savedLinks] : links;
+          const updatedAdvisory = {
+            title: headline,
+            description: description,
+            dcTicketNumber: ticketNumber,
+            isSafetyRelated: isSafetyRelated,
+            listingRank: parseInt(listingRank),
+            note: notes,
+            submittedBy: submittedBy,
+            updatedDate: updatedDate,
+            modifiedDate: moment().toISOString(),
+            modifiedBy: keycloak.tokenParsed.name,
+            advisoryDate: advisoryDate,
+            effectiveDate: startDate,
+            endDate: endDate,
+            expiryDate: expiryDate,
+            accessStatus: accessStatus,
+            eventType: eventType,
+            urgency: urgency,
+            protectedAreas: selProtectedAreas,
+            advisoryStatus: status,
+            links: updatedLinks,
+            regions: selRegions,
+            sections: selSections,
+            managementAreas: selManagementAreas,
+            sites: selSites,
+            fireCentres: selFireCentres,
+            fireZones: selFireZones,
+            isReservationsAffected: isReservationAffected,
+            isAdvisoryDateDisplayed: displayAdvisoryDate,
+            isEffectiveDateDisplayed: displayStartDate,
+            isEndDateDisplayed: displayEndDate,
+            isUpdatedDateDisplayed: displayUpdatedDate,
+            published_at: published,
+            updated_by: keycloak.tokenParsed.name,
+          };
+
+          apiAxios
+            .put(`api/update/public-advisories/${id}`, updatedAdvisory, {
+              headers: { Authorization: `Bearer ${keycloak.idToken}` },
+            })
+            .then((res) => {
+              setAdvisoryId(res.data.id);
+              setIsSubmitting(false);
+              setIsSavingDraft(false);
+              setIsConfirmation(true);
+            })
+            .catch((error) => {
+              console.log("error occurred", error);
+              setToError(true);
+              setError({
+                status: 500,
+                message: "Could not process advisory update",
+              });
             });
-          });
-      });
+        });
+      }
     } catch (error) {
       console.log("error occurred", error);
       setToError(true);
@@ -835,7 +930,7 @@ export default function Advisory({
                   label="Back"
                   styling="bcgov-normal-white btn mt10"
                   onClick={() => {
-                    setToDashboard(true);
+                    setToBack();
                   }}
                 />
               </div>
@@ -925,8 +1020,9 @@ export default function Advisory({
                   isSubmitting,
                   isSavingDraft,
                   updateAdvisory,
-                  setToDashboard,
-                  setIsConfirmation,
+                  setToBack,
+                  formError,
+                  setFormError,
                 }}
               />
             </>

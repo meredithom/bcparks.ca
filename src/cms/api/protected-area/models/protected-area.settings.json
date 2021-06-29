@@ -80,17 +80,9 @@
     "featureId": {
       "type": "integer"
     },
-    "managementAreas": {
-      "via": "protectedArea",
-      "collection": "management-area"
-    },
     "sites": {
       "via": "protectedArea",
       "collection": "site"
-    },
-    "fireZones": {
-      "collection": "fire-zone",
-      "via": "protectedArea"
     },
     "parkActivities": {
       "via": "protectedArea",
@@ -109,6 +101,23 @@
     },
     "hasSmokingBan": {
       "type": "boolean"
+    },
+    "fireZones": {
+      "via": "protectedAreas",
+      "collection": "fire-zone"
+    },
+    "managementAreas": {
+      "via": "protectedAreas",
+      "collection": "management-area"
+    },
+    "hasCampfireBanOverride": {
+      "type": "boolean"
+    },
+    "hasSmokingBanOverride": {
+      "type": "boolean"
+    },
+    "campfireBanRescindedDate": {
+      "type": "date"
     }
   }
 }

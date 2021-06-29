@@ -33,46 +33,50 @@ function isLatestStatutoryHolidayList(statData) {
   return true;
 }
 
-export function getAdvisoryFields(type, advisoryStatuses) {
+export function getSubmitterAdvisoryFields(
+  type,
+  advisoryStatuses,
+  setConfirmationText
+) {
   let status = {};
-  let confirmationText = "";
   let published = null;
-  if (type === "submit") {
-    status = advisoryStatuses.filter((s) => s.code === "ARQ");
-    confirmationText = "Your advisory has been sent for review successfully!";
-  } else if (type === "draft") {
+  if (type === "draft") {
     status = advisoryStatuses.filter((s) => s.code === "DFT");
-    confirmationText = "Your advisory has been saved successfully!";
+    setConfirmationText("Your advisory has been saved successfully!");
   } else if (type === "publish") {
     status = advisoryStatuses.filter((s) => s.code === "PUB");
-    confirmationText = "Your advisory has been published successfully!";
-    published = moment().tz("America/Vancouver");
-  }
-  return {
-    selAdvisoryStatus: status[0]["value"],
-    confirmationText: confirmationText,
-    published: published,
-  };
-}
-
-export function getUpdateAdvisoryFields(code, isAfterHourPublish) {
-  let confirmationText = "";
-  let published = null;
-
-  if (code === "DFT") {
-    confirmationText = "Your advisory has been saved successfully!";
-  } else if (isAfterHourPublish || code === "PUB") {
-    confirmationText = "Your advisory has been published successfully!";
+    setConfirmationText("Your advisory has been published successfully!");
     published = moment().tz("America/Vancouver");
   } else {
-    confirmationText = "Your advisory has been sent for review successfully!";
+    status = advisoryStatuses.filter((s) => s.code === "ARQ");
+    setConfirmationText("Your advisory has been sent for review successfully!");
   }
-  return { confirmationText, published };
+  return { status: status[0]["value"], published: published };
 }
 
-function addProtectedAreas(area, field, selProtectedAreas) {
+export function getApproverAdvisoryFields(code, setConfirmationText) {
+  let published = null;
+  if (code === "PUB") {
+    setConfirmationText("Your advisory has been published successfully!");
+    published = moment().tz("America/Vancouver");
+  } else {
+    setConfirmationText("Your advisory has been saved successfully!");
+  }
+  return published;
+}
+
+function addProtectedAreasFromArea(area, field, selProtectedAreas, areaList) {
   area[field].forEach((f) => {
-    selProtectedAreas.push(f.protectedArea);
+    const relatedArea = areaList.find((a) => {
+      return a.obj.id === f.id;
+    });
+    addProtectedAreas(relatedArea.obj.protectedAreas, selProtectedAreas);
+  });
+}
+
+function addProtectedAreas(protectedAreas, selProtectedAreas) {
+  protectedAreas.forEach((park) => {
+    selProtectedAreas.push(park.id);
   });
 }
 
@@ -83,7 +87,9 @@ export function getLocationSelection(
   selectedManagementAreas,
   selectedSites,
   selectedFireCentres,
-  selectedFireZones
+  selectedFireZones,
+  managementAreas,
+  fireZones
 ) {
   const selProtectedAreas = [];
   const selRegions = [];
@@ -92,13 +98,33 @@ export function getLocationSelection(
   const selSites = [];
   const selFireCentres = [];
   const selFireZones = [];
-  setAreaValues(selectedProtectedAreas, selProtectedAreas, null);
-  setAreaValues(selectedRegions, selRegions, selProtectedAreas);
-  setAreaValues(selectedSections, selSections, selProtectedAreas);
-  setAreaValues(selectedManagementAreas, selManagementAreas, selProtectedAreas);
-  setAreaValues(selectedSites, selSites, selProtectedAreas);
-  setAreaValues(selectedFireCentres, selFireCentres, selProtectedAreas);
-  setAreaValues(selectedFireZones, selFireZones, selProtectedAreas);
+  setAreaValues(selectedProtectedAreas, selProtectedAreas, null, null);
+  setAreaValues(
+    selectedRegions,
+    selRegions,
+    selProtectedAreas,
+    managementAreas
+  );
+  setAreaValues(
+    selectedSections,
+    selSections,
+    selProtectedAreas,
+    managementAreas
+  );
+  setAreaValues(
+    selectedManagementAreas,
+    selManagementAreas,
+    selProtectedAreas,
+    null
+  );
+  setAreaValues(selectedSites, selSites, selProtectedAreas, null);
+  setAreaValues(
+    selectedFireCentres,
+    selFireCentres,
+    selProtectedAreas,
+    fireZones
+  );
+  setAreaValues(selectedFireZones, selFireZones, selProtectedAreas, null);
   return {
     selProtectedAreas,
     selRegions,
@@ -110,24 +136,151 @@ export function getLocationSelection(
   };
 }
 
-const setAreaValues = (areas, selAreas, selProtectedAreas) => {
+const setAreaValues = (areas, selAreas, selProtectedAreas, areaList) => {
   if (areas && areas.length > 0) {
     areas.forEach((a) => {
       selAreas.push(a.value);
-      if (
-        a.type === "managementArea" ||
-        a.type === "fireZone" ||
-        a.type === "site"
-      ) {
+      if (a.type === "managementArea" || a.type === "fireZone") {
+        addProtectedAreas(a.obj.protectedAreas, selProtectedAreas);
+      } else if (a.type === "site") {
         selProtectedAreas.push(a.obj.protectedArea.id);
       } else if (a.type === "region" || a.type === "section") {
-        addProtectedAreas(a.obj, "managementAreas", selProtectedAreas);
+        addProtectedAreasFromArea(
+          a.obj,
+          "managementAreas",
+          selProtectedAreas,
+          areaList
+        );
       } else if (a.type === "fireCentre") {
-        addProtectedAreas(a.obj, "fireZones", selProtectedAreas);
+        addProtectedAreasFromArea(
+          a.obj,
+          "fireZones",
+          selProtectedAreas,
+          areaList
+        );
       }
     });
   }
 };
+
+function removeProtectedAreasFromArea(
+  area,
+  field,
+  updatedProtectedAreas,
+  areaList
+) {
+  let parks = updatedProtectedAreas;
+  area[field].forEach((f) => {
+    const relatedArea = areaList.find((a) => {
+      return a.obj.id === f.id;
+    });
+    parks = removeProtectedAreas(relatedArea.obj.protectedAreas, parks);
+  });
+  return parks;
+}
+
+function removeProtectedAreas(protectedAreas, parks) {
+  const parkIds = protectedAreas.map((p) => p.id);
+  parks = parks.filter((p) => !parkIds.includes(p.value));
+  return parks;
+}
+
+const removeAreaValues = (
+  existingAreas,
+  selectedAreas,
+  areaList,
+  updatedProtectedAreas
+) => {
+  if (existingAreas && existingAreas.length > 0) {
+    existingAreas.forEach((a) => {
+      if (!selectedAreas.includes(a)) {
+        if (a.type === "managementArea" || a.type === "fireZone") {
+          updatedProtectedAreas = removeProtectedAreas(
+            a.obj.protectedAreas,
+            updatedProtectedAreas
+          );
+        } else if (a.type === "site") {
+          updatedProtectedAreas = updatedProtectedAreas.filter(
+            (p) => a.obj.protectedArea.id !== p.value
+          );
+        } else if (a.type === "region" || a.type === "section") {
+          updatedProtectedAreas = removeProtectedAreasFromArea(
+            a.obj,
+            "managementAreas",
+            updatedProtectedAreas,
+            areaList
+          );
+        } else if (a.type === "fireCentre") {
+          updatedProtectedAreas = removeProtectedAreasFromArea(
+            a.obj,
+            "fireZones",
+            updatedProtectedAreas,
+            areaList
+          );
+        }
+      }
+    });
+  }
+  return updatedProtectedAreas;
+};
+
+export function removeLocations(
+  selectedProtectedAreas,
+  selectedRegions,
+  existingRegions,
+  selectedSections,
+  existingSections,
+  selectedManagementAreas,
+  existingManagementAreas,
+  selectedSites,
+  existingSites,
+  selectedFireCentres,
+  existingFireCentres,
+  selectedFireZones,
+  existingFireZones,
+  managementAreas,
+  fireZones
+) {
+  let updatedProtectedAreas = selectedProtectedAreas;
+  updatedProtectedAreas = removeAreaValues(
+    existingRegions,
+    selectedRegions,
+    managementAreas,
+    updatedProtectedAreas
+  );
+
+  updatedProtectedAreas = removeAreaValues(
+    existingSections,
+    selectedSections,
+    managementAreas,
+    updatedProtectedAreas
+  );
+  updatedProtectedAreas = removeAreaValues(
+    existingManagementAreas,
+    selectedManagementAreas,
+    null,
+    updatedProtectedAreas
+  );
+  updatedProtectedAreas = removeAreaValues(
+    existingSites,
+    selectedSites,
+    null,
+    updatedProtectedAreas
+  );
+  updatedProtectedAreas = removeAreaValues(
+    existingFireCentres,
+    selectedFireCentres,
+    fireZones,
+    updatedProtectedAreas
+  );
+  updatedProtectedAreas = removeAreaValues(
+    existingFireZones,
+    selectedFireZones,
+    null,
+    updatedProtectedAreas
+  );
+  return updatedProtectedAreas;
+}
 
 export function calculateIsStatHoliday(
   setIsStatHoliday,
@@ -144,10 +297,11 @@ export function calculateIsStatHoliday(
         .then((res) => {
           const statData = res.data.data;
           if (
+            !statData ||
             Object.keys(statData).length === 0 ||
             !isLatestStatutoryHolidayList(statData)
           ) {
-            throw new Error("Obsolete Holiday List");
+            throw new Error("Obsolete Holiday List. Reloading...");
           }
           const data = cmsData;
           data.statutoryHolidays = statData;

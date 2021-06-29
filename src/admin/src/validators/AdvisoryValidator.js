@@ -78,13 +78,12 @@ export function validateDate(field) {
   return true;
 }
 
-export function validAdvisoryData(advisoryData, mode) {
+export function validAdvisoryData(advisoryData, validateStatus, mode) {
   advisoryData.formError("");
   const validListingRank = validateOptionalNumber(advisoryData.listingRank);
   const validTicketNumber = validateOptionalNumber(advisoryData.ticketNumber);
   const validHeadline = validateRequiredText(advisoryData.headline);
   const validEventType = validateRequiredSelect(advisoryData.eventType);
-  const validAccessStatus = validateRequiredSelect(advisoryData.accessStatus);
   const validDescription = validateRequiredText(advisoryData.description);
   const validUrgency = validateRequiredSelect(advisoryData.urgency);
   const validLocations = validateRequiredLocation(advisoryData.protectedArea);
@@ -98,7 +97,6 @@ export function validAdvisoryData(advisoryData, mode) {
     validTicketNumber &&
     validHeadline &&
     validEventType &&
-    validAccessStatus &&
     validDescription &&
     validUrgency &&
     validLocations &&
@@ -107,12 +105,15 @@ export function validAdvisoryData(advisoryData, mode) {
     validEndDate &&
     validExpiryDate &&
     validSubmittedBy;
-  if (mode === "update") {
-    const validUpdatedDate = validateOptionalDate(advisoryData.updatedDate);
+  if (validateStatus) {
     const validAdvisoryStatus = validateRequiredSelect(
       advisoryData.advisoryStatus
     );
-    validData = validData && validUpdatedDate && validAdvisoryStatus;
+    validData = validData && validAdvisoryStatus;
+  }
+  if (mode === "update") {
+    const validUpdatedDate = validateOptionalDate(advisoryData.updatedDate);
+    validData = validData && validUpdatedDate;
   }
   if (!validData) {
     advisoryData.formError("Errors found !!! Please enter valid information");
