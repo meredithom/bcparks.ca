@@ -47,8 +47,21 @@ const tableIcons = {
 };
 
 export default function DataTable(props) {
+  props.options.pageSize =
+    props.data.length > props.options.pageSize
+      ? props.options.pageSize
+      : props.data.length;
+
+  let newPageSizeOptions = [];
+
+  props.options.pageSizeOptions.forEach((row) => {
+    if (props.data.length > row) newPageSizeOptions.push(row);
+  });
+
+  props.options.pageSizeOptions = newPageSizeOptions;
+
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} className="data-table">
       <MaterialTable icons={tableIcons} {...props} />
     </TableContainer>
   );

@@ -24,6 +24,11 @@
   font-weight: bold;
 }
 
+.revisionIcon {
+  color: gray;
+  font-size: 14px;
+}
+
 .draftIcon
 {
   color:#4989C5; 
@@ -61,3 +66,7 @@
   text-align: center !important;
 }
   
+.MuiChip-root {
+  margin-right: 4px;
+  margin-left: 4px;
+}

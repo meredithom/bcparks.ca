@@ -52,6 +52,9 @@
     "url": {
       "type": "string"
     },
+    "oldUrl": {
+      "type": "string"
+    },
     "typeCode": {
       "type": "enumeration",
       "enum": [
@@ -118,6 +121,45 @@
     },
     "campfireBanRescindedDate": {
       "type": "date"
+    },
+    "description": {
+      "type": "text"
+    },
+    "safetyInfo": {
+      "type": "text"
+    },
+    "specialNotes": {
+      "type": "text"
+    },
+    "locationNotes": {
+      "type": "text"
+    },
+    "parkContact": {
+      "type": "text"
+    },
+    "reservations": {
+      "type": "text"
+    },
+    "maps": {
+      "type": "text"
+    },
+    "managementPlanning": {
+      "type": "text"
+    },
+    "natureAndCulture": {
+      "type": "text"
+    },
+    "partnerships": {
+      "type": "text"
+    },
+    "purpose": {
+      "type": "text"
+    },
+    "reconciliationNotes": {
+      "type": "text"
+    },
+    "slug": {
+      "type": "string"
     }
   }
 }

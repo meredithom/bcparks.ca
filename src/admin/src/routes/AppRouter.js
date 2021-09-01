@@ -3,12 +3,13 @@ import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 import Home from "../components/page/home/Home";
 import Error from "../components/page/error/Error";
 import About from "../components/page/about/About";
-import AdvisoryDashboard from "../components/page/advisoryDashboard/AdvisoryDashboard";
 import Advisory from "../components/page/advisory/Advisory";
 import AdvisorySummary from "../components/page/advisorySummary/AdvisorySummary";
+import AppDashboard from "../components/page/appDashboard/AppDashboard";
+import ParkInfo from "../components/page/parkInfo/ParkInfo";
 import { PrivateRoute } from "../auth/PrivateRoute";
 import CmsContents from "../components/page/cmsContents/CmsContents";
-import ParkStatus from "../components/page/parkStatus/ParkStatus";
+import ParkAccessStatus from "../components/page/parkAccessStatus/ParkAccessStatus";
 
 function AppRouter() {
   const [error, setError] = useState({});
@@ -28,13 +29,19 @@ function AppRouter() {
           <Route exact path="/bcparks/cms-contents">
             <CmsContents />
           </Route>
-          <Route exact path="/bcparks/park-status">
-            <ParkStatus />
+          <Route exact path="/bcparks/park-access-status">
+            <ParkAccessStatus />
           </Route>
           <PrivateRoute
             roles={["submitter", "approver"]}
-            path="/bcparks/advisory-dash"
-            component={AdvisoryDashboard}
+            path="/bcparks/dashboard"
+            component={AppDashboard}
+            props={{ page: { setError, cmsData, setCmsData } }}
+          />
+          <PrivateRoute
+            roles={["approver"]}
+            path="/bcparks/park-info/:id"
+            component={ParkInfo}
             props={{ page: { setError, cmsData, setCmsData } }}
           />
           <PrivateRoute

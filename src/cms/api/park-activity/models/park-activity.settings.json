@@ -28,11 +28,17 @@
       "model": "protected-area"
     },
     "site": {
-      "model": "site",
-      "via": "parkActivities"
+      "via": "parkActivities",
+      "model": "site"
     },
     "activityType": {
       "model": "activity-type"
+    },
+    "modifiedBy": {
+      "type": "string"
+    },
+    "modifiedDate": {
+      "type": "datetime"
     }
   }
 }

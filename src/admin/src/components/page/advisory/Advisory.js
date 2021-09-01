@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { cmsAxios, apiAxios } from "../../../axios_config";
+import { apiAxios } from "../../../axios_config";
 import { Redirect, useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import "./Advisory.css";
@@ -32,13 +32,19 @@ import {
   getAdvisoryStatuses,
   getLinkTypes,
   getBusinessHours,
+  getStandardMessages,
 } from "../../../utils/CmsDataUtil";
-import { hasRole } from "../../../utils/AuthenticationUtils";
+import { hasRole } from "../../../utils/AuthenticationUtil";
+import { labelCompare } from "../../../utils/AppUtil";
 
 export default function Advisory({
   mode,
   page: { setError, cmsData, setCmsData },
 }) {
+  const [advisoryNumber, setAdvisoryNumber] = useState();
+  const [revisionNumber, setRevisionNumber] = useState();
+  const [standardMessages, setStandardMessages] = useState([]);
+  const [selectedStandardMessages, setSelectedStandardMessages] = useState([]);
   const [protectedAreas, setProtectedAreas] = useState([]);
   const [selectedProtectedAreas, setSelectedProtectedAreas] = useState([]);
   const [regions, setRegions] = useState([]);
@@ -77,19 +83,16 @@ export default function Advisory({
   const [advisoryDate, setAdvisoryDate] = useState(
     moment().tz("America/Vancouver")
   );
-  const [displayAdvisoryDate, setDisplayAdvisoryDate] = useState(false);
+  const [displayAdvisoryDate, setDisplayAdvisoryDate] = useState(true);
   const [startDate, setStartDate] = useState(moment().tz("America/Vancouver"));
   const [displayStartDate, setDisplayStartDate] = useState(false);
-  const [endDate, setEndDate] = useState(moment().tz("America/Vancouver"));
+  const [endDate, setEndDate] = useState(null);
   const [displayEndDate, setDisplayEndDate] = useState(false);
-  const [expiryDate, setExpiryDate] = useState(
-    moment().tz("America/Vancouver")
-  );
+  const [expiryDate, setExpiryDate] = useState(null);
   const [updatedDate, setUpdatedDate] = useState(
     moment().tz("America/Vancouver")
   );
   const [displayUpdatedDate, setDisplayUpdatedDate] = useState(false);
-  const [pictures, setPictures] = useState([]);
   const [notes, setNotes] = useState("");
   const [submittedBy, setSubmittedBy] = useState("");
   const [listingRank, setListingRank] = useState("");
@@ -112,6 +115,7 @@ export default function Advisory({
   const [advisoryId, setAdvisoryId] = useState();
   const [isApprover, setIsApprover] = useState(false);
   const [formError, setFormError] = useState("");
+  const [defaultLinkType, setDefaultLinkType] = useState();
 
   const { id } = useParams();
 
@@ -140,11 +144,18 @@ export default function Advisory({
     if (mode === "update" && !isLoadingData) {
       if (parseInt(id)) {
         setAdvisoryId(id);
-        cmsAxios
-          .get(`/public-advisories/${id}?_publicationState=preview`)
+        apiAxios
+          .get(
+            `api/get/public-advisory-audits/${id}?_publicationState=preview`,
+            {
+              headers: { Authorization: `Bearer ${keycloak.idToken}` },
+            }
+          )
           .then((res) => {
             linksRef.current = [];
             const advisoryData = res.data;
+            setAdvisoryNumber(advisoryData.advisoryNumber);
+            setRevisionNumber(advisoryData.revisionNumber);
             setHeadline(advisoryData.title || "");
             setDescription(advisoryData.description || "");
             setTicketNumber(advisoryData.dcTicketNumber || "");
@@ -159,6 +170,9 @@ export default function Advisory({
             if (advisoryData.advisoryDate) {
               setAdvisoryDate(
                 moment(advisoryData.advisoryDate).tz("America/Vancouver")
+              );
+              advisoryDateRef.current = moment(advisoryData.advisoryDate).tz(
+                "America/Vancouver"
               );
             }
             if (advisoryData.effectiveDate) {
@@ -214,6 +228,7 @@ export default function Advisory({
               setDisplayUpdatedDate(advisoryData.isUpdatedDateDisplayed);
             }
 
+            const standardMessageInfo = advisoryData.standardMessages;
             const protectedAreaInfo = advisoryData.protectedAreas;
             const regionInfo = advisoryData.regions;
             const sectionInfo = advisoryData.sections;
@@ -221,6 +236,16 @@ export default function Advisory({
             const siteInfo = advisoryData.sites;
             const fireCentreInfo = advisoryData.fireCentres;
             const fireZoneInfo = advisoryData.fireZones;
+
+            if (standardMessageInfo) {
+              const selStandardMessages = [];
+              standardMessageInfo.forEach((p) => {
+                selStandardMessages.push(
+                  standardMessages.find((l) => l.value === p.id)
+                );
+              });
+              setSelectedStandardMessages([...selStandardMessages]);
+            }
 
             if (protectedAreaInfo) {
               const selProtectedAreas = [];
@@ -291,7 +316,9 @@ export default function Advisory({
                     title: l.title || "",
                     url: l.url || "",
                     id: l.id,
+                    file: l.file,
                     isModified: false,
+                    isFileModified: false,
                   },
                 ];
               });
@@ -345,6 +372,8 @@ export default function Advisory({
     eventTypes,
     setToError,
     setError,
+    standardMessages,
+    setSelectedStandardMessages,
     protectedAreas,
     setSelectedProtectedAreas,
     regions,
@@ -359,6 +388,7 @@ export default function Advisory({
     setSelectedFireCentres,
     fireZones,
     setSelectedFireZones,
+    keycloak,
   ]);
 
   useEffect(() => {
@@ -378,6 +408,7 @@ export default function Advisory({
         getUrgencies(cmsData, setCmsData),
         getAdvisoryStatuses(cmsData, setCmsData),
         getLinkTypes(cmsData, setCmsData),
+        getStandardMessages(cmsData, setCmsData),
       ])
         .then((res) => {
           const protectedAreaData = res[0];
@@ -413,11 +444,12 @@ export default function Advisory({
           setManagementAreas([...managementAreas]);
           const siteData = res[4];
           const sites = siteData.map((s) => ({
-            label: s.siteName,
+            label: s.protectedArea.protectedAreaName + ": " + s.siteName,
             value: s.id,
             type: "site",
             obj: s,
           }));
+          sites.sort(labelCompare);
           setSites([...sites]);
           const fireCentreData = res[5];
           const fireCentres = fireCentreData.map((f) => ({
@@ -484,8 +516,24 @@ export default function Advisory({
             value: lt.id,
           }));
           setLinkTypes([...linkTypes]);
+          const linkType = linkTypes.filter((l) => l.label === "General");
+          if (linkType.length > 0) {
+            setDefaultLinkType(linkType[0].value);
+          }
+
+          const standardMessageData = res[12];
+          const standardMessages = standardMessageData.map((m) => ({
+            label: m.title,
+            value: m.id,
+            type: "standardMessage",
+            obj: m,
+          }));
+          setStandardMessages([...standardMessages]);
           if (mode === "create") {
-            setUrgency(urgencyData[0].id);
+            const defaultUrgency = urgencies.filter((u) => u.label === "Low");
+            if (defaultUrgency.length > 0) {
+              setUrgency(defaultUrgency[0].value);
+            }
             setIsLoadingPage(false);
           }
           setSubmittedBy(keycloak.tokenParsed.name);
@@ -502,6 +550,7 @@ export default function Advisory({
         });
     }
   }, [
+    setStandardMessages,
     setProtectedAreas,
     setRegions,
     setSections,
@@ -538,10 +587,6 @@ export default function Advisory({
     }
   };
 
-  const onDrop = (picture) => {
-    setPictures([...pictures, picture]);
-  };
-
   const handleDurationIntervalChange = (e) => {
     durationIntervalRef.current = e.value;
     calculateExpiryDate();
@@ -563,13 +608,18 @@ export default function Advisory({
   const setLinkIds = () => {
     const linkIds = [];
     linksRef.current.forEach((l) => {
-      linkIds.push(l.id);
+      if (l.id) {
+        linkIds.push(l.id);
+      }
     });
     setLinks(linkIds);
   };
 
   const addLink = () => {
-    linksRef.current = [...linksRef.current, { title: "", url: "" }];
+    linksRef.current = [
+      ...linksRef.current,
+      { title: "", url: "", type: defaultLinkType },
+    ];
     setLinkIds();
   };
 
@@ -587,8 +637,16 @@ export default function Advisory({
     setLinkIds();
   };
 
+  const handleFileCapture = (files, index) => {
+    const tempLinks = [...linksRef.current];
+    tempLinks[index]["file"] = files[0];
+    tempLinks[index].isFileModified = true;
+    linksRef.current = [...tempLinks];
+    setLinkIds();
+  };
+
   const calculateExpiryDate = () => {
-    setExpiryDate(
+    setEndDate(
       moment(advisoryDateRef.current).add(
         durationIntervalRef.current,
         durationUnitRef.current
@@ -597,52 +655,66 @@ export default function Advisory({
   };
 
   const isValidLink = (link) => {
-    if (link.title !== "" && link.url !== "" && link.isModified) {
+    if (
+      (link.title !== "" && link.url !== "" && link.isModified) ||
+      (link.file && link.isFileModified)
+    ) {
       return true;
     }
     return false;
   };
 
   const createLink = async (link) => {
-    const linkRequest = {
-      title: link.title,
-      url: link.url,
-      type: link.type,
-    };
-    const res = await apiAxios
-      .post(`api/add/links`, linkRequest, {
-        headers: { Authorization: `Bearer ${keycloak.idToken}` },
-      })
-      .catch((error) => {
-        console.log("error occurred", error);
-        setToError(true);
-        setError({
-          status: 500,
-          message: "Could not process advisory update",
+    if (link.isFileModified) {
+      const id = await preSaveMediaLink(link);
+      const res = await saveMediaAttachment(id, link);
+      return res;
+    } else {
+      const linkRequest = {
+        title: link.title,
+        url: link.url.startsWith("http") ? link.url : "https://" + link.url,
+        type: link.type,
+      };
+      const res = await apiAxios
+        .post(`api/add/links`, linkRequest, {
+          headers: { Authorization: `Bearer ${keycloak.idToken}` },
+        })
+        .catch((error) => {
+          console.log("error occurred", error);
+          setToError(true);
+          setError({
+            status: 500,
+            message: "Could not process advisory update",
+          });
         });
-      });
-    return res.data;
+      return res.data;
+    }
   };
 
   const saveLink = async (link, id) => {
-    const linkRequest = {
-      title: link.title,
-      url: link.url,
-      type: link.type,
-    };
-    const res = await apiAxios
-      .put(`api/update/links/${id}`, linkRequest, {
-        headers: { Authorization: `Bearer ${keycloak.idToken}` },
-      })
-      .catch((error) => {
-        console.log("error occurred", error);
-        setToError(true);
-        setError({
-          status: 500,
-          message: "Could not process advisory update",
+    if (link.isFileModified) {
+      const res = await saveMediaAttachment(id, link);
+      return res;
+    } else {
+      const linkRequest = {
+        title: link.title,
+        url: link.url.startsWith("http") ? link.url : "https://" + link.url,
+        type: link.type,
+      };
+      const res = await apiAxios
+        .put(`api/update/links/${id}`, linkRequest, {
+          headers: { Authorization: `Bearer ${keycloak.idToken}` },
+        })
+        .catch((error) => {
+          console.log("error occurred", error);
+          setToError(true);
+          setError({
+            status: 500,
+            message: "Could not process advisory update",
+          });
         });
-      });
-    return res.data;
+      return res.data;
+    }
   };
 
   const saveLinks = async () => {
@@ -690,7 +762,7 @@ export default function Advisory({
   };
   const saveAdvisory = (type) => {
     try {
-      const { published, status } = getAdvisoryFields(type);
+      const { status } = getAdvisoryFields(type);
       const {
         selProtectedAreas,
         selRegions,
@@ -708,7 +780,8 @@ export default function Advisory({
         selectedFireCentres,
         selectedFireZones,
         managementAreas,
-        fireZones
+        fireZones,
+        sites
       );
       Promise.resolve(saveLinks()).then((savedLinks) => {
         const newAdvisory = {
@@ -728,6 +801,7 @@ export default function Advisory({
           accessStatus: accessStatus ? accessStatus : null,
           eventType: eventType,
           urgency: urgency,
+          standardMessages: selectedStandardMessages.map((s) => s.value),
           protectedAreas: selProtectedAreas,
           advisoryStatus: status,
           links: savedLinks,
@@ -741,12 +815,13 @@ export default function Advisory({
           isAdvisoryDateDisplayed: displayAdvisoryDate,
           isEffectiveDateDisplayed: displayStartDate,
           isEndDateDisplayed: displayEndDate,
-          published_at: published,
+          published_at: new Date(),
+          isLatestRevision: true,
           created_by: keycloak.tokenParsed.name,
         };
 
         apiAxios
-          .post(`api/add/public-advisories`, newAdvisory, {
+          .post(`api/add/public-advisory-audits`, newAdvisory, {
             headers: { Authorization: `Bearer ${keycloak.idToken}` },
           })
           .then((res) => {
@@ -776,8 +851,8 @@ export default function Advisory({
 
   const updateAdvisory = (type) => {
     try {
-      const { published, status } = getAdvisoryFields(type);
-      const updatedProtectedAreas = removeLocations(
+      const { status } = getAdvisoryFields(type);
+      const { updatedProtectedAreas, updatedSites } = removeLocations(
         selectedProtectedAreas,
         selectedRegions,
         existingRegions,
@@ -792,7 +867,8 @@ export default function Advisory({
         selectedFireZones,
         existingFireZones,
         managementAreas,
-        fireZones
+        fireZones,
+        sites
       );
       const {
         selProtectedAreas,
@@ -807,15 +883,20 @@ export default function Advisory({
         selectedRegions,
         selectedSections,
         selectedManagementAreas,
-        selectedSites,
+        updatedSites,
         selectedFireCentres,
         selectedFireZones,
         managementAreas,
-        fireZones
+        fireZones,
+        sites
       );
 
-      if (!selProtectedAreas || selProtectedAreas.length === 0) {
+      if (
+        (!selProtectedAreas || selProtectedAreas.length === 0) &&
+        (!selSites || selSites.length === 0)
+      ) {
         setSelectedProtectedAreas([]);
+        setSelectedSites([]);
         setIsSubmitting(false);
         setIsSavingDraft(false);
         setFormError("Please select at least one Location!!");
@@ -841,6 +922,7 @@ export default function Advisory({
             accessStatus: accessStatus,
             eventType: eventType,
             urgency: urgency,
+            standardMessages: selectedStandardMessages.map((s) => s.value),
             protectedAreas: selProtectedAreas,
             advisoryStatus: status,
             links: updatedLinks,
@@ -855,12 +937,13 @@ export default function Advisory({
             isEffectiveDateDisplayed: displayStartDate,
             isEndDateDisplayed: displayEndDate,
             isUpdatedDateDisplayed: displayUpdatedDate,
-            published_at: published,
+            published_at: new Date(),
+            isLatestRevision: true,
             updated_by: keycloak.tokenParsed.name,
           };
 
           apiAxios
-            .put(`api/update/public-advisories/${id}`, updatedAdvisory, {
+            .put(`api/update/public-advisory-audits/${id}`, updatedAdvisory, {
               headers: { Authorization: `Bearer ${keycloak.idToken}` },
             })
             .then((res) => {
@@ -889,20 +972,110 @@ export default function Advisory({
     }
   };
 
+  const preSaveMediaLink = async (link) => {
+    const linkRequest = {
+      type: link.type,
+      title: link.title,
+    };
+    const res = await apiAxios
+      .post(`api/add/links`, linkRequest, {
+        headers: { Authorization: `Bearer ${keycloak.idToken}` },
+      })
+      .catch((error) => {
+        console.log("error occurred", error);
+        setToError(true);
+        setError({
+          status: 500,
+          message: "Could not save attachments",
+        });
+      });
+    return res.data.id;
+  };
+
+  const updateMediaLink = async (media, id, link) => {
+    const linkRequest = {
+      title: link.title ? link.title : media.name,
+      type: link.type,
+      url: process.env.REACT_APP_CMS_BASE_URL + media.url,
+    };
+    const res = await apiAxios
+      .put(`api/update/links/${id}`, linkRequest, {
+        headers: { Authorization: `Bearer ${keycloak.idToken}` },
+      })
+      .catch((error) => {
+        console.log("error occurred", error);
+        setToError(true);
+        setError({
+          status: 500,
+          message: "Could not save attachments",
+        });
+      });
+    return res.data;
+  };
+
+  const saveMediaAttachment = async (id, link) => {
+    const mediaResponse = await uploadMedia(id, link.file);
+    const updateLinkResponse = await updateMediaLink(mediaResponse, id, link);
+    return updateLinkResponse;
+  };
+
+  const uploadMedia = async (id, file) => {
+    const fileForm = new FormData();
+    fileForm.append("refId", id);
+    fileForm.append("ref", "link");
+    fileForm.append("field", "file");
+    fileForm.append("files", file);
+
+    const res = await apiAxios
+      .post(`api/upload/upload`, fileForm, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${keycloak.idToken}`,
+        },
+      })
+      .catch((error) => {
+        console.log("error occurred", error);
+        setToError(true);
+        setError({
+          status: 500,
+          message: "Could not save attachments",
+        });
+      });
+    if (res.data.length > 0) {
+      return res.data[0];
+    } else {
+      setToError(true);
+      setError({
+        status: 500,
+        message: "Could not save attachments",
+      });
+    }
+  };
+
   if (toDashboard) {
-    return <Redirect to="/bcparks/advisory-dash" />;
+    return (
+      <Redirect
+        push
+        to={{
+          pathname: `/bcparks/dashboard`,
+          index: 0,
+        }}
+      />
+    );
   }
 
   if (toError) {
-    return <Redirect to="/bcparks/error" />;
+    return <Redirect push to="/bcparks/error" />;
   }
 
   if (isConfirmation) {
     return (
       <Redirect
+        push
         to={{
           pathname: `/bcparks/advisory-summary/${advisoryId}`,
           confirmationText: confirmationText,
+          index: 0,
         }}
       />
     );
@@ -910,11 +1083,7 @@ export default function Advisory({
 
   return (
     <main>
-      <Header
-        header={{
-          name: "",
-        }}
-      />
+      <Header />
       <br />
       <div className="Advisory" data-testid="Advisory">
         <div className="container">
@@ -937,6 +1106,8 @@ export default function Advisory({
               <AdvisoryForm
                 mode={mode}
                 data={{
+                  advisoryNumber,
+                  revisionNumber,
                   ticketNumber,
                   setTicketNumber,
                   listingRank,
@@ -951,6 +1122,9 @@ export default function Advisory({
                   setAccessStatus,
                   description,
                   setDescription,
+                  standardMessages,
+                  selectedStandardMessages,
+                  setSelectedStandardMessages,
                   protectedAreas,
                   selectedProtectedAreas,
                   setSelectedProtectedAreas,
@@ -999,12 +1173,12 @@ export default function Advisory({
                   setExpiryDate,
                   handleDurationIntervalChange,
                   handleDurationUnitChange,
-                  onDrop,
                   linksRef,
                   linkTypes,
                   removeLink,
                   updateLink,
                   addLink,
+                  handleFileCapture,
                   notes,
                   setNotes,
                   submittedBy,

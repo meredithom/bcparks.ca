@@ -1,3 +1,7 @@
+require("dotenv").config({
+  path: `.env.${process.env.NODE_ENV}`,
+})
+
 module.exports = {
   siteMetadata: {
     title: `BC Parks Staging Site`,
@@ -6,6 +10,7 @@ module.exports = {
   },
   plugins: [
     `gatsby-plugin-react-helmet`,
+    `gatsby-plugin-sass`,
     `gatsby-plugin-image`,
     {
       resolve: `gatsby-source-filesystem`,
@@ -18,9 +23,18 @@ module.exports = {
       resolve: "gatsby-source-strapi",
       options: {
         apiURL: process.env.REACT_APP_CMS_BASE_URL,
-        collectionTypes: ["urgency", "protected-area", "public-advisory"],
-        singleTypes: [`business-hours`],
-        queryLimit: 10,
+        collectionTypes: [
+          "urgency",
+          "protected-area",
+          "public-advisory",
+          "park-access-status",
+          "park-photo",
+          `Websites`,
+          `Pages`,
+          "activity-types",
+          "facility-types",
+        ],
+        queryLimit: -1,
       },
     },
     `gatsby-transformer-sharp`,
@@ -35,6 +49,14 @@ module.exports = {
         theme_color: `#663399`,
         display: `minimal-ui`,
         icon: `src/images/bcid-favicon-32x32.png`, // This path is relative to the root of the site.
+      },
+    },
+    {
+      resolve: `gatsby-plugin-material-ui`,
+      options: {
+        stylesProvider: {
+          injectFirst: true,
+        },
       },
     },
     `gatsby-plugin-gatsby-cloud`,

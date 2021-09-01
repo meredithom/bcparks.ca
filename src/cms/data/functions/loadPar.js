@@ -34,6 +34,9 @@ const loadParData = async () => {
 const loadAdditionalParData = async () => {
   await loadAdditionalProtectedAreaInfo();
   await loadAdditionalSiteInfo();
+  await loadParkDetails();
+  await loadParkUrl();
+  await loadParSomeDefaultValues();
 };
 
 const loadRegion = async (area) => {
@@ -282,6 +285,11 @@ const loadAdditionalSiteInfo = async () => {
         if (s.mapZoom !== "") {
           site.mapZoom = s.mapZoom;
         }
+        if (s.note.includes("custom")) {
+          site.isUnofficialSite = true;
+        }
+        site.note = s.note;
+
         await strapi.services["site"]
           .update({ orcsSiteNumber: s.orcs + "-" + s.orcsSiteNumber }, site)
           .catch(async () => {
@@ -318,7 +326,96 @@ const loadAdditionalSiteInfo = async () => {
   }
 };
 
+const loadParkDetails = async () => {
+  const reconciliationNotes =
+    "We honour their connection to the land and respect the importance of their diverse teachings, traditions and practices within these territories. This park webpage may not adequately represent the full history of this park and the relationship of Indigenous peoples to this land. As such, BC Parks is working in partnership to update information found on our websites to better reflect the history, cultures and connection of Indigenous peoples to the land and to work together to protect these special places.";
+
+  try {
+    strapi.log.info("loading park details");
+    var jsonData = fs.readFileSync("./data/park-details.json", "utf8");
+    const data = JSON.parse(jsonData);
+
+    for await (const park of data["parkDetails"]) {
+      const protectedArea = {
+        description: park.description,
+        safetyInfo: park.safetyInfo,
+        specialNotes: park.specialNotes,
+        locationNotes: park.locationNotes,
+        parkContact: park.parkContact,
+        reservations: park.reservations,
+        maps: park.maps,
+        natureAndCulture: park.natureAndCulture,
+        reconciliationNotes: reconciliationNotes,
+        purpose: park.purpose,
+        managementPlanning: park.managementPlanning,
+        partnerships: park.partnerships,
+      };
+      await strapi.services["protected-area"]
+        .update({ orcs: park.orcs }, protectedArea)
+        .catch((error) => {
+          strapi.log.error(`error load park details: orcs ${park.orcs}`, error);
+        });
+    }
+    strapi.log.info("loading park details completed...");
+  } catch (error) {
+    strapi.log.error(error);
+  }
+};
+
+const loadParkUrl = async () => {
+  try {
+    strapi.log.info("loading park urls");
+    var jsonData = fs.readFileSync("./data/park-urls.json", "utf8");
+    const data = JSON.parse(jsonData);
+
+    for await (const park of data["parkUrls"]) {
+      const protectedArea = {
+        url: park.url,
+        oldUrl: park.oldUrl,
+        slug: park.url.replace("https://bcparks.ca/", "").replace(/\/$/, ""),
+      };
+      await strapi.services["protected-area"]
+        .update({ orcs: park.orcs }, protectedArea)
+        .catch((error) => {
+          strapi.log.error(`error load park urls: orcs ${park.orcs}`, error);
+        });
+    }
+    strapi.log.info("loading park urls completed...");
+  } catch (error) {
+    strapi.log.error(error);
+  }
+};
+
+// load some default value for graphql to load
+const loadParSomeDefaultValues = async () => {
+  strapi.log.info("loading park default values started...");
+  const protectedAreas = await strapi.services["protected-area"].find({
+    _limit: 5,
+  });
+
+  for (const protectedArea of protectedAreas) {
+    strapi.log.info("set default value for", protectedArea.orcs);
+    protectedArea.isDayUsePass =
+      protectedArea.isDayUsePass === true ? true : false;
+    protectedArea.isFogZone = protectedArea.isFogZone === true ? true : false;
+    protectedArea.hasCampfireBan =
+      protectedArea.hasCampfireBan === true ? true : false;
+    protectedArea.hasSmokingBan =
+      protectedArea.hasSmokingBan === true ? true : false;
+
+    await strapi.services["protected-area"]
+      .update({ orcs: protectedArea.orcs }, protectedArea)
+      .catch((error) => {
+        strapi.log.error(`error load park details: orcs ${park.orcs}`, error);
+      });
+  }
+  strapi.log.info("loading park default values completed...");
+};
+
 module.exports = {
   loadParData,
   loadAdditionalParData,
+  loadParkDetails,
+  loadParkUrl,
+  loadParSomeDefaultValues,
 };

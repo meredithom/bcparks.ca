@@ -66,6 +66,7 @@ const loadFireBanProhibition = async () => {
     .get(WILDFIRE_BANS_PROHIBITIONS_API_ENDPOINT)
     .then(async (response) => {
       const { features } = response.data;
+      if (!features) return;
       features.forEach(async (feature) => {
         const {
           attributes: {
@@ -97,6 +98,7 @@ const loadFireBanProhibition = async () => {
           prohibitionDescription: access_prohibition_description,
           effectiveDate: access_status_effective_date,
           bulletinURL: bulletin_url,
+          fireCentreSource: fire_centre_name,
           fireCentre: fireCentre,
           fireZone: fireZone,
         };
@@ -107,6 +109,14 @@ const loadFireBanProhibition = async () => {
     .catch((error) => {
       strapi.log.error(error);
     });
+};
+
+const loadStandardMessage = async () => {
+  loadUtils.loadJson(
+    "standard-message",
+    "./data/standard-message.json",
+    "standard-message"
+  );
 };
 
 const loadUrgency = async () => {
@@ -164,34 +174,52 @@ const loadParkActivity = async () => {
 
   const currentData = await strapi.services[modelName].find();
   if (currentData.length === 0) {
-    strapi.log.info("loading park activity...");
-    var jsonData = fs.readFileSync("./data/park-activity-xref.json", "utf8");
-    const dataSeed = JSON.parse(jsonData)["park-activity-xref"];
+    try {
+      strapi.log.info("loading park activity...");
+      var jsonData = fs.readFileSync("./data/park-activity-xref.json", "utf8");
+      const parkActivityData = JSON.parse(jsonData)["parkActivity"];
 
-    for await (const data of dataSeed) {
-      const protectedArea = await strapi.services["protected-area"].findOne({
-        orcs: data.orcs,
-      });
-      const protectedAreaId = protectedArea ? protectedArea.id : null;
+      for await (const activity of parkActivityData) {
+        const protectedArea = await strapi.services["protected-area"].findOne({
+          orcs: activity.orcs,
+        });
+        const protectedAreaId = protectedArea ? protectedArea.id : null;
 
-      const site = await strapi.services["site"].findOne({
-        siteNumber: data.siteNumber,
-      });
-      const siteId = site ? site.id : null;
+        let site;
+        if (!isNaN(activity.orcsSiteNumber)) {
+          site = await strapi.services["site"].findOne({
+            siteNumber: activity.orcsSiteNumber,
+          });
+        }
+        const siteId = site ? site.id : null;
 
-      const activityType = await strapi.services["activity-type"].findOne({
-        activityNumber: data.activityId,
-      });
-      const activityTypeId = activityType ? activityType.id : null;
+        if (!activity.activityNumber) continue;
 
-      const parkActivity = {
-        protectedArea: protectedAreaId,
-        site: siteId,
-        activityType: activityTypeId,
-        isActivityOpen: data.available === "Y" ? true : false,
-        isActive: true,
-      };
-      await strapi.services["park-activity"].create(parkActivity);
+        const activityType = await strapi.services["activity-type"].findOne({
+          activityNumber: activity.activityNumber,
+        });
+        const activityTypeId = activityType ? activityType.id : null;
+
+        const parkActivity = {
+          protectedArea: protectedAreaId,
+          site: siteId,
+          activityType: activityTypeId,
+          description: activity.description,
+          isActivityOpen: activity.isActivityOpen,
+          isActive: activity.isActive,
+        };
+        await strapi.services["park-activity"]
+          .create(parkActivity)
+          .catch((error) => {
+            strapi.log.error(
+              `error creating park-activity ${parkActivity.activityNumber}...`,
+              error,
+              parkActivity
+            );
+          });
+      }
+    } catch (error) {
+      strapi.log.error(error);
     }
     strapi.log.info("loading park activity completed...");
   }
@@ -208,34 +236,52 @@ const loadParkFacility = async () => {
 
   const currentData = await strapi.services[modelName].find();
   if (currentData.length === 0) {
-    strapi.log.info("loading park facility...");
-    var jsonData = fs.readFileSync("./data/park-facility-xref.json", "utf8");
-    const dataSeed = JSON.parse(jsonData)["park-facility-xref"];
+    try {
+      strapi.log.info("loading park facility...");
+      var jsonData = fs.readFileSync("./data/park-facility-xref.json", "utf8");
+      const parkFacilityData = JSON.parse(jsonData)["parkFacility"];
 
-    for await (const data of dataSeed) {
-      const protectedArea = await strapi.services["protected-area"].findOne({
-        orcs: data.orcs,
-      });
-      const protectedAreaId = protectedArea ? protectedArea.id : null;
+      for await (const facility of parkFacilityData) {
+        const protectedArea = await strapi.services["protected-area"].findOne({
+          orcs: facility.orcs,
+        });
+        const protectedAreaId = protectedArea ? protectedArea.id : null;
 
-      const site = await strapi.services["site"].findOne({
-        siteNumber: data.siteNumber,
-      });
-      const siteId = site ? site.id : null;
+        let site;
+        if (!isNaN(facility.orcsSiteNumber)) {
+          site = await strapi.services["site"].findOne({
+            siteNumber: facility.orcsSiteNumber,
+          });
+        }
+        const siteId = site ? site.id : null;
 
-      const facilityType = await strapi.services["facility-type"].findOne({
-        facilityNumber: data.facilityId,
-      });
-      const facilityTypeId = facilityType ? facilityType.id : null;
+        if (!facility.facilityNumber) continue;
 
-      const parkFacility = {
-        protectedArea: protectedAreaId,
-        site: siteId,
-        facilityType: facilityTypeId,
-        isFacilityOpen: data.available === "Y" ? true : false,
-        isActive: true,
-      };
-      await strapi.services["park-facility"].create(parkFacility);
+        const facilityType = await strapi.services["facility-type"].findOne({
+          facilityNumber: facility.facilityNumber,
+        });
+        const facilityTypeId = facilityType ? facilityType.id : null;
+
+        const parkFacility = {
+          protectedArea: protectedAreaId,
+          site: siteId,
+          facilityType: facilityTypeId,
+          description: facility.description,
+          isFacilityOpen: facility.isFacilityOpen,
+          isActive: facility.isActive,
+        };
+        await strapi.services["park-facility"]
+          .create(parkFacility)
+          .catch((error) => {
+            strapi.log.error(
+              `error creating park-facility ${parkFacility.facilityNumber}...`,
+              error,
+              parkFacility
+            );
+          });
+      }
+    } catch (error) {
+      strapi.log.error(error);
     }
     strapi.log.info("loading park facility completed...");
   }
@@ -362,6 +408,14 @@ const loadStatutoryHolidays = async () => {
   }
 };
 
+const loadWebsites = async () => {
+  loadUtils.loadJson("website", "./data/websites.json", "website");
+};
+
+const loadPages = async () => {
+  loadUtils.loadJson("page", "./data/pages.json", "page");
+};
+
 module.exports = {
   loadBusinessHours,
   loadStatutoryHolidays,
@@ -376,6 +430,7 @@ module.exports = {
   loadFireZone,
   loadFireCentreZoneXref,
   loadFireBanProhibition,
+  loadStandardMessage,
   loadUrgency,
   loadParkActivity,
   loadParkFacility,
@@ -383,4 +438,6 @@ module.exports = {
   loadParkName,
   loadParkFireZoneXref,
   loadParkFogZoneXref,
+  loadPages,
+  loadWebsites,
 };

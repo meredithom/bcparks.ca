@@ -9,19 +9,19 @@ import {
   Checkbox,
   FormControl,
   FormHelperText,
+  Button as Btn,
+  Tooltip,
 } from "@material-ui/core";
 import MomentUtils from "@date-io/moment";
 import {
   KeyboardDateTimePicker,
   MuiPickersUtilsProvider,
 } from "@material-ui/pickers";
-import ImageUploader from "react-images-upload";
 import Select from "react-select";
 import { withStyles } from "@material-ui/core/styles";
 import WarningIcon from "@material-ui/icons/Warning";
 import CloseIcon from "@material-ui/icons/Close";
 import AddIcon from "@material-ui/icons/Add";
-import Tooltip from "@material-ui/core/Tooltip";
 import HelpIcon from "@material-ui/icons/Help";
 import VisibilityToggle from "../../base/visibilityToggle/VisibilityToggle";
 import {
@@ -35,10 +35,13 @@ import {
 } from "../../../validators/AdvisoryValidator";
 
 import PrivateElement from "../../../auth/PrivateElement";
+import AdvisoryHistory from "../advisoryHistory/AdvisoryHistory";
 
 export default function AdvisoryForm({
   mode,
   data: {
+    advisoryNumber,
+    revisionNumber,
     ticketNumber,
     setTicketNumber,
     listingRank,
@@ -53,6 +56,9 @@ export default function AdvisoryForm({
     setAccessStatus,
     description,
     setDescription,
+    standardMessages,
+    selectedStandardMessages,
+    setSelectedStandardMessages,
     protectedAreas,
     selectedProtectedAreas,
     setSelectedProtectedAreas,
@@ -101,12 +107,12 @@ export default function AdvisoryForm({
     setExpiryDate,
     handleDurationIntervalChange,
     handleDurationUnitChange,
-    onDrop,
     linksRef,
     linkTypes,
     removeLink,
     updateLink,
     addLink,
+    handleFileCapture,
     notes,
     setNotes,
     submittedBy,
@@ -133,7 +139,6 @@ export default function AdvisoryForm({
   const [advisoryStatusError, setAdvisoryStatusError] = useState("");
   const [ticketNumberError, setTicketNumberError] = useState("");
   const [headlineError, setHeadlineError] = useState("");
-  const [descriptionError, setDescriptionError] = useState("");
   const [advisoryDateError, setAdvisoryDateError] = useState("");
   const [startDateError, setStartDateError] = useState("");
   const [endDateError, setEndDateError] = useState("");
@@ -151,11 +156,6 @@ export default function AdvisoryForm({
       setError: setEventTypeError,
       text: "event type",
     },
-    description: {
-      value: description,
-      setError: setDescriptionError,
-      text: "description",
-    },
     protectedArea: {
       value: [
         selectedProtectedAreas,
@@ -167,7 +167,7 @@ export default function AdvisoryForm({
         selectedSites,
       ],
       setError: setProtectedAreaError,
-      text: "at least one location area",
+      text: "at least one affected area",
     },
     urgency: { value: urgency, setError: setUrgencyError, text: "urgency" },
     advisoryDate: { value: advisoryDate, setError: setAdvisoryDateError },
@@ -260,6 +260,36 @@ export default function AdvisoryForm({
     <MuiPickersUtilsProvider utils={MomentUtils}>
       <form>
         <div className="container-fluid ad-form">
+          {advisoryNumber && (
+            <>
+              <div className="row">
+                <div className="col-lg-4 col-md-4 col-sm-12 ad-label">
+                  Advisory Number
+                </div>
+                <div className="col-lg-7 col-md-8 col-sm-12">
+                  <TextField
+                    value={advisoryNumber}
+                    className="bcgov-input ad-disabled"
+                    variant="outlined"
+                    disabled
+                  />
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-lg-4 col-md-4 col-sm-12 ad-label">
+                  Revision Number
+                </div>
+                <div className="col-lg-7 col-md-8 col-sm-12">
+                  <TextField
+                    value={revisionNumber}
+                    className="bcgov-input ad-disabled"
+                    variant="outlined"
+                    disabled
+                  />
+                </div>
+              </div>
+            </>
+          )}
           <div className="row">
             <div className="col-lg-4 col-md-4 col-sm-12 ad-label bcgov-required">
               Headline
@@ -368,7 +398,7 @@ export default function AdvisoryForm({
             </div>
           </div>
           <div className="row">
-            <div className="col-lg-4 col-md-4 col-sm-12 ad-label bcgov-required">
+            <div className="col-lg-4 col-md-4 col-sm-12 ad-label">
               Description
             </div>
             <div className="col-lg-7 col-md-8 col-sm-12">
@@ -383,16 +413,52 @@ export default function AdvisoryForm({
                 className="bcgov-input"
                 variant="outlined"
                 InputProps={{ ...descriptionInput }}
-                error={descriptionError !== ""}
-                helperText={descriptionError}
-                onBlur={() => {
-                  validateRequiredText(advisoryData.description);
-                }}
               />
             </div>
           </div>
           <div className="row">
-            <div className="col-lg-4 col-md-4 col-sm-12 ad-label">Parks</div>
+            <div className="col-lg-4 col-md-4 col-sm-12 ad-label">
+              Standard Message(s)
+            </div>
+            <div className="col-lg-7 col-md-8 col-sm-12">
+              <FormControl
+                variant="outlined"
+                className={`bcgov-select-form ${
+                  protectedAreaError !== "" ? "bcgov-select-error" : ""
+                }`}
+                error
+              >
+                <Select
+                  options={standardMessages}
+                  value={selectedStandardMessages}
+                  onChange={(e) => {
+                    setSelectedStandardMessages(e);
+                  }}
+                  placeholder="Add standard message"
+                  isMulti="true"
+                  className="bcgov-select"
+                />
+              </FormControl>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-lg-4 col-md-4 col-sm-12  bcgov-required ad-label">
+              Select at least one affected area:
+            </div>
+            <div className="col-lg-7 col-md-8 col-sm-12">
+              <FormControl
+                variant="outlined"
+                className={`bcgov-select-form ${
+                  protectedAreaError !== "" ? "bcgov-select-error" : ""
+                }`}
+                error
+              >
+                <FormHelperText>{protectedAreaError}</FormHelperText>
+              </FormControl>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-lg-4 col-md-4 col-sm-12 ad-label">Park(s)</div>
             <div className="col-lg-7 col-md-8 col-sm-12">
               <FormControl
                 variant="outlined"
@@ -414,92 +480,11 @@ export default function AdvisoryForm({
                     validateRequiredLocation(advisoryData.protectedArea);
                   }}
                 />
-                <FormHelperText>{protectedAreaError}</FormHelperText>
               </FormControl>
             </div>
           </div>
           <div className="row">
-            <div className="col-lg-4 col-md-4 col-sm-12 ad-label">Region</div>
-            <div className="col-lg-7 col-md-8 col-sm-12">
-              <FormControl
-                variant="outlined"
-                className={`bcgov-select-form ${
-                  protectedAreaError !== "" ? "bcgov-select-error" : ""
-                }`}
-                error
-              >
-                <Select
-                  options={regions}
-                  value={selectedRegions}
-                  onChange={(e) => {
-                    setSelectedRegions(e);
-                  }}
-                  placeholder="Select a Region"
-                  isMulti="true"
-                  className="bcgov-select"
-                  onBlur={() => {
-                    validateRequiredLocation(advisoryData.protectedArea);
-                  }}
-                />
-              </FormControl>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-lg-4 col-md-4 col-sm-12 ad-label">Section</div>
-            <div className="col-lg-7 col-md-8 col-sm-12">
-              <FormControl
-                variant="outlined"
-                className={`bcgov-select-form ${
-                  protectedAreaError !== "" ? "bcgov-select-error" : ""
-                }`}
-                error
-              >
-                <Select
-                  options={sections}
-                  value={selectedSections}
-                  onChange={(e) => {
-                    setSelectedSections(e);
-                  }}
-                  placeholder="Select a Section"
-                  isMulti="true"
-                  className="bcgov-select"
-                  onBlur={() => {
-                    validateRequiredLocation(advisoryData.protectedArea);
-                  }}
-                />
-              </FormControl>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-lg-4 col-md-4 col-sm-12 ad-label">
-              Management Area
-            </div>
-            <div className="col-lg-7 col-md-8 col-sm-12">
-              <FormControl
-                variant="outlined"
-                className={`bcgov-select-form ${
-                  protectedAreaError !== "" ? "bcgov-select-error" : ""
-                }`}
-                error
-              >
-                <Select
-                  options={managementAreas}
-                  value={selectedManagementAreas}
-                  onChange={(e) => {
-                    setSelectedManagementAreas(e);
-                  }}
-                  placeholder="Select a Management Area"
-                  isMulti="true"
-                  className="bcgov-select"
-                  onBlur={() => {
-                    validateRequiredLocation(advisoryData.protectedArea);
-                  }}
-                />
-              </FormControl>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-lg-4 col-md-4 col-sm-12 ad-label">Site</div>
+            <div className="col-lg-4 col-md-4 col-sm-12 ad-label">Site(s)</div>
             <div className="col-lg-7 col-md-8 col-sm-12">
               <FormControl
                 variant="outlined"
@@ -526,7 +511,91 @@ export default function AdvisoryForm({
           </div>
           <div className="row">
             <div className="col-lg-4 col-md-4 col-sm-12 ad-label">
-              Fire Centre
+              Region(s)
+            </div>
+            <div className="col-lg-7 col-md-8 col-sm-12">
+              <FormControl
+                variant="outlined"
+                className={`bcgov-select-form ${
+                  protectedAreaError !== "" ? "bcgov-select-error" : ""
+                }`}
+                error
+              >
+                <Select
+                  options={regions}
+                  value={selectedRegions}
+                  onChange={(e) => {
+                    setSelectedRegions(e);
+                  }}
+                  placeholder="Select a Region"
+                  isMulti="true"
+                  className="bcgov-select"
+                  onBlur={() => {
+                    validateRequiredLocation(advisoryData.protectedArea);
+                  }}
+                />
+              </FormControl>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-lg-4 col-md-4 col-sm-12 ad-label">
+              Section(s)
+            </div>
+            <div className="col-lg-7 col-md-8 col-sm-12">
+              <FormControl
+                variant="outlined"
+                className={`bcgov-select-form ${
+                  protectedAreaError !== "" ? "bcgov-select-error" : ""
+                }`}
+                error
+              >
+                <Select
+                  options={sections}
+                  value={selectedSections}
+                  onChange={(e) => {
+                    setSelectedSections(e);
+                  }}
+                  placeholder="Select a Section"
+                  isMulti="true"
+                  className="bcgov-select"
+                  onBlur={() => {
+                    validateRequiredLocation(advisoryData.protectedArea);
+                  }}
+                />
+              </FormControl>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-lg-4 col-md-4 col-sm-12 ad-label">
+              Management Area(s)
+            </div>
+            <div className="col-lg-7 col-md-8 col-sm-12">
+              <FormControl
+                variant="outlined"
+                className={`bcgov-select-form ${
+                  protectedAreaError !== "" ? "bcgov-select-error" : ""
+                }`}
+                error
+              >
+                <Select
+                  options={managementAreas}
+                  value={selectedManagementAreas}
+                  onChange={(e) => {
+                    setSelectedManagementAreas(e);
+                  }}
+                  placeholder="Select a Management Area"
+                  isMulti="true"
+                  className="bcgov-select"
+                  onBlur={() => {
+                    validateRequiredLocation(advisoryData.protectedArea);
+                  }}
+                />
+              </FormControl>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-lg-4 col-md-4 col-sm-12 ad-label">
+              Fire Centre(s)
             </div>
             <div className="col-lg-7 col-md-8 col-sm-12">
               <FormControl
@@ -554,7 +623,7 @@ export default function AdvisoryForm({
           </div>
           <div className="row">
             <div className="col-lg-4 col-md-4 col-sm-12 ad-label">
-              Fire Zone
+              Fire Zone(s)
             </div>
             <div className="col-lg-7 col-md-8 col-sm-12">
               <FormControl
@@ -742,6 +811,8 @@ export default function AdvisoryForm({
                               onBlur={() => {
                                 validateOptionalDate(advisoryData.endDate);
                               }}
+                              minDate={startDate}
+                              minDateMessage="End date should not be before Advisory date"
                             />
                             <VisibilityToggle
                               toggle={{
@@ -812,6 +883,8 @@ export default function AdvisoryForm({
                               onBlur={() => {
                                 validateOptionalDate(advisoryData.expiryDate);
                               }}
+                              minDate={startDate}
+                              minDateMessage="Expiry date should not be before Advisory date"
                             />
                           </div>
                         </div>
@@ -823,7 +896,7 @@ export default function AdvisoryForm({
                       <div className="p10 col-lg-4 col-md-3 col-sm-12 ad-duration-label">
                         Duration
                       </div>
-                      <div className="p10 ml15 col-lg-8 col-md-6 col-sm-8 col-8 ptm3 ad-interval-box">
+                      <div className="p10 ml15 col-lg-8 col-md-6 col-sm-8 col-8 pt3 ad-interval-box">
                         <Select
                           options={intervals}
                           onChange={handleDurationIntervalChange}
@@ -841,22 +914,6 @@ export default function AdvisoryForm({
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-lg-4 col-md-4 col-sm-12 ad-label">Photos</div>
-            <div className="col-lg-8 col-md-8 col-sm-12 ">
-              <ImageUploader
-                withIcon={false}
-                onChange={onDrop}
-                imgExtension={[".jpg", ".gif", ".png", ".gif"]}
-                maxFileSize={5242880}
-                withPreview={true}
-                buttonText="Add a photo"
-                buttonClassName="bcgov-normal-blue btn"
-                withLabel={false}
-                className="ad-field bg-blue"
-              />
             </div>
           </div>
           <div className="row ">
@@ -908,6 +965,29 @@ export default function AdvisoryForm({
                       variant="outlined"
                       InputProps={{ ...linkUrlInput }}
                     />
+                    <div className="ad-flex">
+                      <TextField
+                        value={l.file ? l.file.name : ""}
+                        className="bcgov-input mr10"
+                        variant="outlined"
+                        placeholder="Select files for upload"
+                      />
+                      <Btn
+                        variant="contained"
+                        component="label"
+                        className="bcgov-normal-blue btn transform-none ad-upload-btn"
+                      >
+                        Upload
+                        <input
+                          type="file"
+                          accept=".jpg,.gif,.png,.gif,.pdf"
+                          hidden
+                          onChange={({ target }) => {
+                            handleFileCapture(target.files, idx);
+                          }}
+                        />
+                      </Btn>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -1161,6 +1241,9 @@ export default function AdvisoryForm({
               )}
             </div>
           </div>
+          <br />
+          <br />
+          <AdvisoryHistory data={{ advisoryNumber }} />
         </div>
       </form>
     </MuiPickersUtilsProvider>
@@ -1170,6 +1253,8 @@ export default function AdvisoryForm({
 AdvisoryForm.propTypes = {
   mode: PropTypes.string.isRequired,
   data: PropTypes.shape({
+    advisoryNumber: PropTypes.number,
+    revisionNumber: PropTypes.number,
     ticketNumber: PropTypes.string,
     setTicketNumber: PropTypes.func.isRequired,
     listingRank: PropTypes.string,
@@ -1184,6 +1269,9 @@ AdvisoryForm.propTypes = {
     setAccessStatus: PropTypes.func.isRequired,
     description: PropTypes.string,
     setDescription: PropTypes.func.isRequired,
+    standardMessages: PropTypes.array.isRequired,
+    selectedStandardMessages: PropTypes.array,
+    setSelectedStandardMessages: PropTypes.func.isRequired,
     protectedAreas: PropTypes.array.isRequired,
     selectedProtectedAreas: PropTypes.array,
     setSelectedProtectedAreas: PropTypes.func.isRequired,
@@ -1232,12 +1320,12 @@ AdvisoryForm.propTypes = {
     setExpiryDate: PropTypes.func.isRequired,
     handleDurationIntervalChange: PropTypes.func.isRequired,
     handleDurationUnitChange: PropTypes.func.isRequired,
-    onDrop: PropTypes.func.isRequired,
     linksRef: PropTypes.object.isRequired,
     linkTypes: PropTypes.array.isRequired,
     removeLink: PropTypes.func.isRequired,
     updateLink: PropTypes.func.isRequired,
     addLink: PropTypes.func.isRequired,
+    handleFileCapture: PropTypes.func.isRequired,
     notes: PropTypes.string,
     setNotes: PropTypes.func.isRequired,
     submittedBy: PropTypes.string,

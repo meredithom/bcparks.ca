@@ -55,6 +55,7 @@ const getPublicAdvisory = (publishedAdvisories, orcs) => {
 const getPublishedPublicAdvisories = async () => {
   return await strapi.services["public-advisory"].find({
     _publicationState: "live",
+    "accessStatus.precedence_lt": 99,
     _sort: "id",
     _limit: -1,
   });
@@ -89,6 +90,7 @@ const getProtectedAreaStatus = async (ctx) => {
   const campfireBanData = await strapi.services["fire-ban-prohibition"].find({
     _limit: -1,
     prohibitionDescription_contains: "campfire",
+    fireCentre_null: false,
   });
 
   const publicAdvisories = await getPublishedPublicAdvisories();
@@ -102,7 +104,9 @@ const getProtectedAreaStatus = async (ctx) => {
     const regions = [
       ...new Set(
         protectedArea.managementAreas.map(
-          (m) => regionsData.find((region) => region.id === m.region).regionName
+          (m) =>
+            regionsData.find((region) => region.id === m.region && m.region)
+              .regionName
         )
       ),
     ];
@@ -111,18 +115,21 @@ const getProtectedAreaStatus = async (ctx) => {
       ...new Set(
         protectedArea.managementAreas.map(
           (m) =>
-            sectionsData.find((section) => section.id === m.section).sectionName
+            sectionsData.find(
+              (section) => section.id === m.section && m.section
+            ).sectionName
         )
       ),
     ];
 
     const fireCentres = [
       ...new Set(
-        protectedArea.fireZones.map(
-          (fireZone) =>
-            fireCentresData.find((f) => f.id === fireZone.fireCentre)
-              .fireCentreName
-        )
+        protectedArea.fireZones.map((fireZone) => {
+          const fireCentre = fireCentresData.find(
+            (f) => f.fireZones.length > 0 && f.id === fireZone.fireCentre
+          );
+          if (fireCentre) return fireCentre.fireCentreName;
+        })
       ),
     ];
 
@@ -140,6 +147,7 @@ const getProtectedAreaStatus = async (ctx) => {
         return {
           activityName: activity.activityName,
           activityCode: activity.activityCode,
+          description: a.description,
           icon: activity.icon,
           iconNA: activity.iconNA,
           rank: activity.rank,
@@ -155,6 +163,7 @@ const getProtectedAreaStatus = async (ctx) => {
         return {
           facilityName: facility.facilityName,
           facilityCode: facility.facilityCode,
+          description: a.description,
           icon: facility.icon,
           iconNA: facility.iconNA,
           rank: facility.rank,
@@ -209,6 +218,7 @@ const getProtectedAreaStatus = async (ctx) => {
     }
 
     return {
+      id: protectedArea.id,
       orcs: protectedArea.orcs,
       orcsSiteNumber: null,
       protectedAreaName: protectedArea.protectedAreaName,

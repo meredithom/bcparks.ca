@@ -23,31 +23,33 @@ module.exports = {
           advisoryStatusMap[a.code] = a;
           return advisoryStatusMap;
         });
-        // fetch advisories to publish
-        const draftAdvisoryToPublish = await strapi.api[
-          "public-advisory"
-        ].services["public-advisory"].find({
-          _publicationState: "preview",
+        // fetch advisories to publish - audit table
+        const draftAdvisoryToPublishAudit = await strapi.api[
+          "public-advisory-audit"
+        ].services["public-advisory-audit"].find({
+          _publicationState: "live",
+          isLatestRevision: true,
           advisoryDate_lte: new Date(),
           advisoryStatus: advisoryStatusMap["APR"].id,
         });
 
-        // publish advisories
-        draftAdvisoryToPublish.forEach(async (advisory) => {
-          await strapi.api["public-advisory"].services[
-            "public-advisory"
+        // publish advisories - audit table
+        draftAdvisoryToPublishAudit.forEach(async (advisory) => {
+          await strapi.api["public-advisory-audit"].services[
+            "public-advisory-audit"
           ].update(
             { id: advisory.id },
             {
               published_at: advisory.advisoryDate,
-              advisoryStatus: advisoryStatusMap["PUB"],
+              advisoryStatus: advisoryStatusMap["PUB"].id,
               modifiedBy: "system",
               modifiedDate: new Date(),
+              removalDate: null,
             }
           );
         });
 
-        // fetch advisories to unpublish
+        // fetch advisories to unpublish - public advisory table
         const advisoryToUnpublish = await strapi.api[
           "public-advisory"
         ].services["public-advisory"].find({
@@ -56,20 +58,30 @@ module.exports = {
           advisoryStatus: advisoryStatusMap["PUB"].id,
         });
 
-        // unpublish advisories
+        // unpublish advisories - audit table
         advisoryToUnpublish.forEach(async (advisory) => {
-          await strapi.api["public-advisory"].services[
-            "public-advisory"
-          ].update(
-            { id: advisory.id },
-            {
-              published_at: null,
-              advisoryStatus: advisoryStatusMap["INA"],
-              removalDate: new Date(),
-              modifiedBy: "system",
-              modifiedDate: new Date(),
-            }
-          );
+          await strapi.api["public-advisory-audit"].services[
+            "public-advisory-audit"
+          ]
+            .update(
+              {
+                advisoryNumber: advisory.advisoryNumber,
+                isLatestRevision: true,
+              },
+              {
+                published_at: new Date(),
+                advisoryStatus: advisoryStatusMap["INA"].id,
+                removalDate: new Date(),
+                modifiedBy: "system",
+                modifiedDate: new Date(),
+              }
+            )
+            .catch((error) => {
+              strapi.log.error(
+                `error updating public-advisory-audit, advisory-number: ${advisory.advisoryNumber}`,
+                error
+              );
+            });
         });
       }
     },

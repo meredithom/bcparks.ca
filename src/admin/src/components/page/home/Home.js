@@ -17,16 +17,19 @@ export default function Home({ page: { setError } }) {
   }, [initialized, keycloak]);
 
   if (toDashboard) {
-    return <Redirect to="/bcparks/advisory-dash" />;
+    return (
+      <Redirect
+        to={{
+          pathname: `/bcparks/dashboard`,
+          index: 0,
+        }}
+      />
+    );
   }
 
   return (
     <main>
-      <Header
-        header={{
-          name: "",
-        }}
-      />
+      <Header />
       <div className={styles.Home} data-testid="Home">
         <div className="container hm-container">
           <h1>BC Parks Staff Portal</h1>
@@ -40,7 +43,7 @@ export default function Home({ page: { setError } }) {
                     <Button
                       onClick={() =>
                         keycloak.login({
-                          redirectUri: `${process.env.REACT_APP_FRONTEND_BASE_URL}/bcparks/advisory-dash`,
+                          redirectUri: `${process.env.REACT_APP_FRONTEND_BASE_URL}/bcparks/dashboard`,
                         })
                       }
                       label="Login"

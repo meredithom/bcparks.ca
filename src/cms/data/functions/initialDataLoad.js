@@ -3,7 +3,9 @@
 const permission = require("./loadPermissions");
 const parData = require("./loadPar");
 const otherData = require("./loadOtherData");
-const publicAdvisory = require("./loadPublicAdvisory");
+const publicAdvisoryAudit = require("./loadPublicAdvisoryAudit");
+const parkPhoto = require("./loadParkPhoto");
+const pageMedia = require("./loadPageMedia");
 
 const isFirstRun = async () => {
   const pluginStore = strapi.store({
@@ -30,20 +32,25 @@ const loadData = async () => {
       otherData.loadActivityType(),
       otherData.loadFacilityType(),
       otherData.loadParkNameType(),
+      otherData.loadStandardMessage(),
       otherData.loadUrgency(),
       otherData.loadFireCentre(),
       otherData.loadFireZone(),
-      otherData.loadFireBanProhibition(),
+      //otherData.loadWebsites(),
+      //otherData.loadPages(),
     ]).then(async () => {
       return Promise.all([
         parData.loadAdditionalParData(),
         otherData.loadFireCentreZoneXref(),
         otherData.loadParkFireZoneXref(),
+        otherData.loadFireBanProhibition(),
         otherData.loadParkFogZoneXref(),
         otherData.loadParkActivity(),
         otherData.loadParkFacility(),
         otherData.loadParkName(),
-        publicAdvisory.loadPublicAdvisory(),
+        publicAdvisoryAudit.loadPublicAdvisoryAudit(),
+        pageMedia.loadPageMedia(),
+        parkPhoto.loadParkPhoto(),        
       ]).then(() => {
         strapi.log.info("------Data load completed------");
         return true;
@@ -82,6 +89,8 @@ const rewriteData = async () => {
       strapi.services["advisory-status"].delete(),
       strapi.services["link-type"].delete(),
       strapi.services["urgency"].delete(),
+      strapi.services["website"].delete(),
+      strapi.services["page"].delete(),
     ]).then(() => {
       strapi.log.info("---------Removing all data completed---------");
       Promise.resolve(loadData()).then(() => {
