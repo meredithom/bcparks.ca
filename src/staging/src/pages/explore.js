@@ -311,6 +311,10 @@ export default function Explore({ location, data }) {
     setCurrentPage(1)
   }
 
+  const handleSearch = () => {
+    setSearchText(inputText)
+  }
+
   const setFilters = useCallback(() => {
     const filters = []
     selectedActivities.forEach(a => {
@@ -566,6 +570,16 @@ export default function Explore({ location, data }) {
                         }}
                       />
                     </div>
+                    <div class="m15t col-12 park-search-text-box-container d-none d-xl-block d-lg-block d-md-none d-sm-none d-xs-none">
+                      <Button
+                        fullWidth
+                        className="bcgov-normal-blue mobile-search-element-height h50p"
+                        onClick={() => {
+                          handleSearch()
+                        }}>
+                        Search
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -728,7 +742,7 @@ export default function Explore({ location, data }) {
                                       :
                                       <div style={{ color: `#2464A4` }}>
                                         Show less
-                                        <ExpandLess fontSize="small"/>
+                                        <ExpandLess fontSize="small" />
                                       </div>
                                   }
                                 </Link>
@@ -764,7 +778,7 @@ export default function Explore({ location, data }) {
                                   {filteredFacilities.map((f) => {
                                     return (
                                       <FormControlLabel
-                                      key={f.label}
+                                        key={f.label}
                                         control={
                                           <Checkbox
                                             checked={
