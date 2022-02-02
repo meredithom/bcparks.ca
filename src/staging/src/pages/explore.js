@@ -541,48 +541,8 @@ export default function Explore({ location, data }) {
                 </div>
               </div>
             </div>
-            <div className="row p20t no-gutters">
-              <div className="col-lg-3 col-md-12 col-sm-12">
-                <div className="search-results-quick-filter">
-                  <div className="row no-gutters">
-                    <div className="col-12 park-search-text-box-container d-none d-xl-block d-lg-block d-md-none d-sm-none d-xs-none">
-                      <TextField
-                        id="park-search-text"
-                        variant="outlined"
-                        placeholder="e.g Alice Park"
-                        className="park-search-text-box h50p"
-                        value={inputText}
-                        onChange={event => {
-                          setInputText(event.target.value)
-                        }}
-                        onKeyPress={ev => {
-                          if (ev.key === "Enter") {
-                            setSearchText(inputText)
-                            ev.preventDefault()
-                          }
-                        }}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <SearchIcon className="search-icon" />
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </div>
-                    <div class="m15t col-12 park-search-text-box-container d-none d-xl-block d-lg-block d-md-none d-sm-none d-xs-none">
-                      <Button
-                        fullWidth
-                        className="bcgov-normal-blue mobile-search-element-height h50p"
-                        onClick={() => {
-                          handleSearch()
-                        }}>
-                        Search
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div className="row no-gutters">
+
               <div className="col-lg-9 col-md-12 col-sm-12">
                 <div className="search-results-quick-filter d-block d-sm-block d-xs-block d-md-block d-lg-none d-xl-none">
                   <div className="row no-gutters">
@@ -629,15 +589,17 @@ export default function Explore({ location, data }) {
                         </Button>
                       </div>
                     </div>
-                    <div className="col-lg-4 col-md-6 col-sm-6 col-xs-6 w50">
-                      <Select
-                        value={sortOption}
-                        className="park-filter-select h50p"
-                        variant="outlined"
-                        options={sortOptions}
-                        onChange={handleSortChange}
-                        placeholder="Sort by"
-                      />
+                    <div className="col-lg-8 col-md-6 col-sm-6 col-xs-6 w50 pr10">
+                      <div className="d-block d-sm-block d-xs-block d-md-block d-lg-none d-xl-none">
+                        <Button
+                          fullWidth
+                          className="bcgov-normal-blue mobile-search-element-height h50p"
+                          onClick={() => {
+                            handleSearch()
+                          }}>
+                          Search
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -645,12 +607,52 @@ export default function Explore({ location, data }) {
             </div>
             <div className="row no-gutters">
               <div className="col-lg-3 col-md-12 col-sm-12">
-                <div className="search-results-quick-filter m15t">
-                  <div className="row p20t no-gutters d-none d-xl-block d-lg-block d-md-none d-sm-none d-xs-none">
+                <div className="search-results-quick-filter">
+                  <div className="row no-gutters d-none d-xl-block d-lg-block d-md-none d-sm-none d-xs-none">
                     <div className="col-12 pr-3">
-                      <h4 className="filter-heading p30t">Filter by</h4>
+                      <div className="search-results-quick-filter">
+                        <div className="row no-gutters pb20">
+                          <div className="col-12 park-search-text-box-container d-none d-xl-block d-lg-block d-md-none d-sm-none d-xs-none">
+                            <TextField
+                              id="park-search-text"
+                              variant="outlined"
+                              placeholder="e.g Alice Park"
+                              className="park-search-text-box h50p"
+                              value={inputText}
+                              onChange={event => {
+                                setInputText(event.target.value)
+                              }}
+                              onKeyPress={ev => {
+                                if (ev.key === "Enter") {
+                                  setSearchText(inputText)
+                                  ev.preventDefault()
+                                }
+                              }}
+                              InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    <SearchIcon className="search-icon" />
+                                  </InputAdornment>
+                                ),
+                              }}
+                            />
+                          </div>
+                          <div class="m15t col-12 park-search-text-box-container d-none d-xl-block d-lg-block d-md-none d-sm-none d-xs-none">
+                            <Button
+                              fullWidth
+                              className="bcgov-normal-blue mobile-search-element-height h50p"
+                              onClick={() => {
+                                handleSearch()
+                              }}>
+                              Search
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-12 pr-3">
                       <div className="">
-                        <h4 className="filter-heading p10t">Popular filters</h4>
+                        <h4 className="filter-heading p10t">Popular</h4>
                         <FormGroup className="p10l filter-options-container">
                           {quickSearchFilters.map((item) => {
                             return (
