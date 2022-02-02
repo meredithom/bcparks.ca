@@ -954,7 +954,7 @@ export default function Explore({ location, data }) {
                                                             className="search-result-icon"
                                                             src={redAlertIcon}
                                                           />
-                                                          <div className="pl15 text-blue">
+                                                          <div className="pl15 text-blue pb20">
                                                             {a} (1)
                                                           </div>
                                                         </>
@@ -990,6 +990,7 @@ export default function Explore({ location, data }) {
                                                       <div className="park-af-list pr3">
                                                         <b>Activities:</b>
                                                       </div>
+                                                      <div></div>
                                                       {r.parkActivities.map(
                                                         (parkActivity, index2) => (
                                                           <div
@@ -1025,6 +1026,7 @@ export default function Explore({ location, data }) {
                                                       <div className="park-af-list pr3">
                                                         <b>Facilities:</b>
                                                       </div>
+                                                      <div></div>
                                                       {r.parkFacilities.map(
                                                         (parkFacility, index3) => (
                                                           <div
