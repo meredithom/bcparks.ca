@@ -35,9 +35,6 @@ const SearchFilter = ({
     setSelectedFacilities,
     searchText,
     setSearchText,
-    sortOption,
-    setSortOption,
-    sortOptions,
   },
 }) => {
   const [showFilters, setShowFilter] = useState([false, false])
@@ -111,7 +108,6 @@ const SearchFilter = ({
         selectedActivities,
         selectedFacilities,
         searchText,
-        sortOption,
       },
     })
     setOpenFilter(false)
@@ -181,18 +177,6 @@ const SearchFilter = ({
                 >
                   Cancel
                 </Button>
-              </div>
-              <div className="p10t col-12 d-block d-sm-block d-xs-block d-md-block d-lg-none d-xl-none">
-                <Select
-                  value={sortOption}
-                  className="park-filter-select h50p"
-                  variant="outlined"
-                  options={sortOptions}
-                  onChange={e => {
-                    setSortOption(e)
-                  }}
-                  placeholder="Sort by"
-                />
               </div>
             </div>
             <div className="row p20t no-gutters">
@@ -548,9 +532,6 @@ SearchFilter.propTypes = {
     setSelectedFacilities: PropTypes.func.isRequired,
     searchText: PropTypes.string.isRequired,
     setSearchText: PropTypes.func.isRequired,
-    sortOption: PropTypes.object.isRequired,
-    setSortOption: PropTypes.func.isRequired,
-    sortOptions: PropTypes.array.isRequired,
   }),
 }
 

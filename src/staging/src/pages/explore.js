@@ -463,7 +463,7 @@ export default function Explore({ location, data }) {
     });
   }, [
     params,
-    sortOption,
+    //sortOption,
     currentPage,
     data.site.siteMetadata.apiURL,
     setFilters,
@@ -542,7 +542,6 @@ export default function Explore({ location, data }) {
               </div>
             </div>
             <div className="row no-gutters">
-
               <div className="col-lg-9 col-md-12 col-sm-12">
                 <div className="search-results-quick-filter d-block d-sm-block d-xs-block d-md-block d-lg-none d-xl-none">
                   <div className="row no-gutters">
@@ -840,7 +839,7 @@ export default function Explore({ location, data }) {
               </div>
               <div className="col-lg-9 col-md-12 col-sm-12">
                 <div className="search-results-list container">
-                  <div className="mt-1 text-center">
+                  <div className="m10t text-center">
                     <i className="fa fa-info-circle"></i> <em>Park search is limited during beta</em>
                   </div>
                   {isLoading && (
@@ -1474,9 +1473,9 @@ export default function Explore({ location, data }) {
           setSelectedFacilities,
           searchText,
           setSearchText,
-          sortOption,
-          setSortOption,
-          sortOptions,
+          //sortOption,
+          //setSortOption,
+          //sortOptions,
         }}
       />
       <Footer>{data.strapiWebsites.Footer}</Footer>
