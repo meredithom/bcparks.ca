@@ -1463,6 +1463,7 @@ export default function Explore({ location, data }) {
         data={{
           activityItems,
           facilityItems,
+          quickSearchFilters,
           openFilter,
           setOpenFilter,
           quickSearch,
@@ -1471,11 +1472,9 @@ export default function Explore({ location, data }) {
           setSelectedActivities,
           selectedFacilities,
           setSelectedFacilities,
+          setQuickSearch,
           searchText,
           setSearchText,
-          //sortOption,
-          //setSortOption,
-          //sortOptions,
         }}
       />
       <Footer>{data.strapiWebsites.Footer}</Footer>
