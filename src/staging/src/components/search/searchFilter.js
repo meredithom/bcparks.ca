@@ -24,22 +24,22 @@ import Select from "react-select"
 import { navigate } from "gatsby"
 
 
-
-
-
 const SearchFilter = ({
   data: {
     activityItems,
     facilityItems,
+    quickSearchFilters,
     openFilter,
     setOpenFilter,
+    quickSearch,
     selectedActivities,
     setSelectedActivities,
     selectedFacilities,
     setSelectedFacilities,
+    setQuickSearch,
     searchText,
     setSearchText,
-    quickSearchFilters,
+    params,
   },
 
 }) => {
@@ -50,12 +50,18 @@ const SearchFilter = ({
     setOpenFilter(false)
   }
 
-  const setQuickSearch = (item, event) => {
-    console.log('set quick search',item,event)
+  //Quick Search/Popular
+  const handleQuickSearchChange = event => {
+    setQuickSearch({
+      ...quickSearch,
+      [event.target.name]: event.target.checked,
+    })
   }
 
-  const handleQuickSearch = (item, event) => {
-    console.log('handle quick search',item,event)
+  const handleQuickSearchDelete = chipToDelete => {
+    //setSelectedActivities(chips =>
+    //  chips.filter(chip => chip.value !== chipToDelete.value)
+    //)
   }
 
   const handleActivityCheck = (activity, event) => {
@@ -112,9 +118,40 @@ const SearchFilter = ({
     selectedFacilities.forEach(f => {
       filters.push({ ...f, type: "facility" })
     })
+
+    const {
+      camping,
+      petFriendly,
+      wheelchair,
+      marine,
+      ecoReserve,
+      electricalHookup,
+    } = quickSearch
+
+    if (camping) {
+      filters.push({ label: "Camping", type: "camping" })
+    }
+    if (petFriendly) {
+      filters.push({ label: "Dog Friendly", type: "petFriendly" })
+    }
+    if (wheelchair) {
+      filters.push({ label: "Wheelchair Accessible", type: "wheelchair" })
+    }
+    if (marine) {
+      filters.push({ label: "Marine Park", type: "marine" })
+    }
+    if (ecoReserve) {
+      filters.push({ label: "Ecological reserve", type: "ecoReserve" })
+    }
+    if (electricalHookup) {
+      filters.push({ label: "Electrical Hookup", type: "electricalHookup" })
+    }
+
     filters.sort((a, b) => a.label.localeCompare(b.label))
     setFilterSelections([...filters])
-  }, [selectedActivities, selectedFacilities])
+  }, [
+    selectedActivities,
+    selectedFacilities,])
 
   const searchParkFilter = () => {
     navigate("/explore", {
@@ -122,6 +159,7 @@ const SearchFilter = ({
         selectedActivities,
         selectedFacilities,
         searchText,
+        quickSearch,
       },
     })
     setOpenFilter(false)
@@ -205,6 +243,7 @@ const SearchFilter = ({
                       onClick={() => {
                         setSelectedActivities([])
                         setSelectedFacilities([])
+                        setQuickSearch([])
                       }}
                       tabIndex="0"
                     >
@@ -255,7 +294,8 @@ const SearchFilter = ({
               <div className="p20l-filter col-lg-8 col-md-12 col-sm-12">
 
                 {/* TODO: Add Popular */}
-                <div className="row">
+                
+                {/* <div className="row">
                   <div className="col-12">
                     <div className="park-filter-options">
 
@@ -283,7 +323,7 @@ const SearchFilter = ({
                         <Link
                           className="ml-auto pointer p20"
                           onClick={() => {
-                            //setSelectedActivities([]) TODO
+                            setQuickSearch([])
                           }}
                           tabIndex="0"
                         >
@@ -300,41 +340,21 @@ const SearchFilter = ({
                       >
                         <div className="row container">
                           <div className="col-lg-6 col-md-12 col-sm-12">
-                          {/* TODO: CHECKBOXES */}
-
                             <FormGroup className="p10l filter-options-container">
                               {
-// const quickSearchFilters = [
-//   { label: 'Camping', type: 'camping' },
-//   { label: 'Dog friendly', type: 'petFriendly' },
-//   { label: 'Wheelchair accessible', type: 'wheelchair' },
-//   { label: 'Marine park', type: 'marine' },
-//   { label: 'Ecological reserve', type: 'ecoReserve' },
-//   { label: 'Electrical hookups', type: 'electricalHookup' }
-// ]
-// const [quickSearch, setQuickSearch] = useState({
-//   camping: false,
-//   petFriendly: false,
-//   wheelchair: false,
-//   marine: false,
-//   ecoReserve: false,
-//   electricalHookup: false,
-// })
-
                                 quickSearchFilters.map((item, index) => (
-                                    <FormControlLabel
-                                      key = {index}
-                                      control={
-                                        <Checkbox
-                                          checked={item.value} 
-                                          onChange={event => {
-                                            handleQuickSearch(item, event)
-                                          }}
-                                          name={item.label}
-                                        />
-                                      }
-                                      label={item.label}
-                                    />
+                                  <FormControlLabel
+                                    key={index}
+                                    control={
+                                      <Checkbox
+                                        checked={item.value}
+                                        onChange={handleQuickSearchChange}
+                                        name={item.label}
+                                      />
+                                    }
+                                    label={item.label}
+
+                                  />
                                 ))
                               }
                             </FormGroup>
@@ -343,7 +363,8 @@ const SearchFilter = ({
                       </Collapse>
                     </div>
                   </div>
-                </div>
+                </div> */}
+
 
                 <div className="row p20t">
                   <div className="col-12">
@@ -391,37 +412,37 @@ const SearchFilter = ({
                         <div className="row container">
                           <div className="col-lg-6 col-md-12 col-sm-12">
                             {activityItems.map((a, index) => (
-                                <FormGroup
-                                  className="pr30 filter-options-container"
-                                  key={index}
-                                >
-                                  <FormControlLabel
-                                    control={
-                                      <Checkbox
-                                        checked={
-                                          selectedActivities.filter(
-                                            act => act.value === a.value
-                                          ).length === 1
-                                            ? true
-                                            : false
-                                        }
-                                        onChange={event => {
-                                          handleActivityCheck(a, event)
-                                        }}
-                                        name={a.label}
-                                      />
-                                    }
-                                    label={a.label}
-                                    className={
-                                      selectedActivities.filter(
-                                        act => act.value === a.value
-                                      ).length === 1
-                                        ? "text-light-blue no-wrap"
-                                        : "no-wrap"
-                                    }
-                                  />
-                                </FormGroup>
-                              ))}
+                              <FormGroup
+                                className="pr30 filter-options-container"
+                                key={index}
+                              >
+                                <FormControlLabel
+                                  control={
+                                    <Checkbox
+                                      checked={
+                                        selectedActivities.filter(
+                                          act => act.value === a.value
+                                        ).length === 1
+                                          ? true
+                                          : false
+                                      }
+                                      onChange={event => {
+                                        handleActivityCheck(a, event)
+                                      }}
+                                      name={a.label}
+                                    />
+                                  }
+                                  label={a.label}
+                                  className={
+                                    selectedActivities.filter(
+                                      act => act.value === a.value
+                                    ).length === 1
+                                      ? "text-light-blue no-wrap"
+                                      : "no-wrap"
+                                  }
+                                />
+                              </FormGroup>
+                            ))}
                           </div>
 
                         </div>
@@ -474,37 +495,37 @@ const SearchFilter = ({
                         <div className="row container">
                           <div className="col-lg-6 col-md-12 col-sm-12">
                             {facilityItems.map((f, index) => (
-                                <FormGroup
-                                  className="pr30 filter-options-container"
-                                  key={index}
-                                >
-                                  <FormControlLabel
-                                    control={
-                                      <Checkbox
-                                        checked={
-                                          selectedFacilities.filter(
-                                            fa => fa.value === f.value
-                                          ).length === 1
-                                            ? true
-                                            : false
-                                        }
-                                        onChange={event => {
-                                          handleFacilityCheck(f, event)
-                                        }}
-                                        name={f.label}
-                                      />
-                                    }
-                                    label={f.label}
-                                    className={
-                                      selectedFacilities.filter(
-                                        fa => fa.value === f.value
-                                      ).length === 1
-                                        ? "text-light-blue no-wrap"
-                                        : "no-wrap"
-                                    }
-                                  />
-                                </FormGroup>
-                              ))}
+                              <FormGroup
+                                className="pr30 filter-options-container"
+                                key={index}
+                              >
+                                <FormControlLabel
+                                  control={
+                                    <Checkbox
+                                      checked={
+                                        selectedFacilities.filter(
+                                          fa => fa.value === f.value
+                                        ).length === 1
+                                          ? true
+                                          : false
+                                      }
+                                      onChange={event => {
+                                        handleFacilityCheck(f, event)
+                                      }}
+                                      name={f.label}
+                                    />
+                                  }
+                                  label={f.label}
+                                  className={
+                                    selectedFacilities.filter(
+                                      fa => fa.value === f.value
+                                    ).length === 1
+                                      ? "text-light-blue no-wrap"
+                                      : "no-wrap"
+                                  }
+                                />
+                              </FormGroup>
+                            ))}
                           </div>
                         </div>
                       </Collapse>
@@ -553,6 +574,7 @@ SearchFilter.propTypes = {
     quickSearchFilters: PropTypes.array.isRequired,
     openFilter: PropTypes.bool.isRequired,
     setOpenFilter: PropTypes.func.isRequired,
+    quickSearch: PropTypes.array.isRequired,
     selectedActivities: PropTypes.array.isRequired,
     setSelectedActivities: PropTypes.func.isRequired,
     selectedFacilities: PropTypes.array.isRequired,
@@ -560,6 +582,7 @@ SearchFilter.propTypes = {
     setQuickSearch: PropTypes.func.isRequired,
     searchText: PropTypes.string.isRequired,
     setSearchText: PropTypes.func.isRequired,
+    params: PropTypes.array.isRequired,
   }),
 }
 
