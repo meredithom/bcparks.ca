@@ -545,7 +545,7 @@ export default function Explore({ location, data }) {
               <div className="col-lg-9 col-md-12 col-sm-12">
                 <div className="search-results-quick-filter d-block d-sm-block d-xs-block d-md-block d-lg-none d-xl-none">
                   <div className="row no-gutters">
-                    <div className="col-12 pb20">
+                    <div className="col-12">
                       <h4 className="filter-heading">
                         Search by park name, location, activity
                       </h4>
@@ -577,7 +577,7 @@ export default function Explore({ location, data }) {
                 </div>
                 <div className="search-results-list container">
                   <div className="row no-gutters">
-                    <div className="col-lg-8 col-md-6 col-sm-6 col-xs-6 w50 pr10">
+                    <div className="col-lg-8 col-md-6 col-sm-12 col-xs-12 pr10 p10t">
                       <div className="d-block d-sm-block d-xs-block d-md-block d-lg-none d-xl-none">
                         <Button
                           variant="outlined"
@@ -588,7 +588,7 @@ export default function Explore({ location, data }) {
                         </Button>
                       </div>
                     </div>
-                    <div className="col-lg-8 col-md-6 col-sm-6 col-xs-6 w50 pr10">
+                    <div className="col-lg-8 col-md-6 col-sm-12 col-xs-12 pr10 p10t">
                       <div className="d-block d-sm-block d-xs-block d-md-block d-lg-none d-xl-none">
                         <Button
                           fullWidth

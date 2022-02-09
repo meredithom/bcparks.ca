@@ -39,7 +39,6 @@ const SearchFilter = ({
     setQuickSearch,
     searchText,
     setSearchText,
-    params,
   },
 
 }) => {
@@ -294,7 +293,7 @@ const SearchFilter = ({
               <div className="p20l-filter col-lg-8 col-md-12 col-sm-12">
 
                 {/* TODO: Add Popular */}
-                
+
                 {/* <div className="row">
                   <div className="col-12">
                     <div className="park-filter-options">
@@ -582,7 +581,6 @@ SearchFilter.propTypes = {
     setQuickSearch: PropTypes.func.isRequired,
     searchText: PropTypes.string.isRequired,
     setSearchText: PropTypes.func.isRequired,
-    params: PropTypes.array.isRequired,
   }),
 }
 
