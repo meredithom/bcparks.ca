@@ -475,7 +475,7 @@ export default function Explore({ location, data }) {
                   {isLoading && isActiveSearch && (
                     <>Searching...</>
                   )}
-                  {!isLoading && isActiveSearch && totalResults > 0 && (
+                  {!isLoading && isActiveSearch && (
                     <>
                       {totalResults}{" "}
                       {totalResults === 1
