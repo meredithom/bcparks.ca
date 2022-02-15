@@ -119,7 +119,7 @@ export default function Explore({ location, data }) {
     activityItems.slice(0, truncatedFilterLength)
   )
 
-  const [showActivities, setActivityVisibility] = useState(false)
+  const [showActivities, setActivityVisibility] = useState(true)
 
   const [showMoreActivities, setMoreActivites] = useState(true)
 
@@ -138,7 +138,7 @@ export default function Explore({ location, data }) {
     facilityItems.slice(0, truncatedFilterLength)
   )
 
-  const [showFacilities, setFacilityVisibility] = useState(false)
+  const [showFacilities, setFacilityVisibility] = useState(true)
 
   const [showMoreFacilities, setMoreFacilities] = useState(true)
 
@@ -505,7 +505,7 @@ export default function Explore({ location, data }) {
                               label={f.label}
                               onDelete={handleFilterDelete(f)}
                               variant="outlined"
-                              className="park-filter-chip text-bold"
+                              className="park-filter-chip font-weight-bold"
                               deleteIcon={<CancelIcon className="close-icon" />}
                             />
                           ))}
@@ -566,7 +566,7 @@ export default function Explore({ location, data }) {
                         <Button
                           variant="outlined"
                           onClick={handleClickOpenFilter}
-                          className="bcgov-button bcgov-normal-white h50p text-bold"
+                          className="bcgov-button bcgov-normal-white h50p font-weight-bold"
                         >
                           Filter
                         </Button>
@@ -612,9 +612,7 @@ export default function Explore({ location, data }) {
                             <Button
                               fullWidth
                               className="bcgov-normal-blue mobile-search-element-height h50p"
-                              onClick={() => {
-                                handleSearch()
-                              }}>
+                              onClick={handleSearch}>
                               Search
                             </Button>
                           </div>
@@ -886,12 +884,12 @@ export default function Explore({ location, data }) {
                                             <div className="row">
                                               <div className="col-12 park-overview-content text-blue small-font">
                                                 {r.isOpenToPublic && (
-                                                  <div className="text-green text-bold">
+                                                  <div className="text-green font-weight-bold">
                                                     Open to public access
                                                   </div>
                                                 )}
                                                 {!r.isOpenToPublic && (
-                                                  <div className="text-red text-bold">
+                                                  <div className="text-red font-weight-bold">
                                                     Closed to public access
                                                   </div>
                                                 )}
@@ -958,7 +956,6 @@ export default function Explore({ location, data }) {
                                                       <div className="park-af-list pr3">
                                                         <b>Activities:</b>
                                                       </div>
-                                                      <div></div>
                                                       {r.parkActivities.map(
                                                         (parkActivity, index2) => (
                                                           <div
@@ -994,7 +991,7 @@ export default function Explore({ location, data }) {
                                                       <div className="park-af-list pr3">
                                                         <b>Facilities:</b>
                                                       </div>
-                                                      <div></div>
+
                                                       {r.parkFacilities.map(
                                                         (parkFacility, index3) => (
                                                           <div
@@ -1087,12 +1084,12 @@ export default function Explore({ location, data }) {
                                             <div className="row">
                                               <div className="col-12 park-overview-content text-blue small-font">
                                                 {r.isOpenToPublic && (
-                                                  <div className="text-green text-bold">
+                                                  <div className="text-green font-weight-bold">
                                                     Open to public access
                                                   </div>
                                                 )}
                                                 {!r.isOpenToPublic && (
-                                                  <div className="text-red text-bold">
+                                                  <div className="text-red font-weight-bold">
                                                     Closed public access
                                                   </div>
                                                 )}
@@ -1204,12 +1201,12 @@ export default function Explore({ location, data }) {
                                             <div className="row">
                                               <div className="col-12 park-overview-content text-blue small-font">
                                                 {r.isOpenToPublic && (
-                                                  <div className="text-green text-bold">
+                                                  <div className="text-green font-weight-bold">
                                                     Open to public access
                                                   </div>
                                                 )}
                                                 {!r.isOpenToPublic && (
-                                                  <div className="text-red text-bold">
+                                                  <div className="text-red font-weight-bold">
                                                     Closed public access
                                                   </div>
                                                 )}
