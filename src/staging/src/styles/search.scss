@@ -527,6 +527,7 @@ div[class$="-singleValue"] {
   margin-top: 10px !important;
 }
 
+
 .p2030 {
   padding: 20px 30px !important;
 }
@@ -573,6 +574,10 @@ div[class$="-singleValue"] {
 
 .mt8 {
   margin-top: 8px !important;
+}
+
+.mb20 {
+  margin-bottom: 20px;
 }
 
 .h50p,
@@ -992,8 +997,8 @@ div[class$="-singleValue"] {
   }
 }
 
-.not-found-container {
-  max-height: 380px !important;
+.no-results-container {
+  min-height: 380px !important;
   background-color: $colorDarkGrey;
   display: flex;
   align-items: center;

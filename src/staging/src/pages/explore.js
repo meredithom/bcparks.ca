@@ -34,6 +34,7 @@ import redAlertIcon from "../images/park/red-alert-32.png"
 import parksLogo from "../images/Mask_Group_5.png"
 import Carousel from "react-material-ui-carousel"
 import SearchFilter from "../components/search/searchFilter"
+import NoSearchResults from "../components/search/noSearchResults"
 
 export const query = graphql`
   query {
@@ -821,20 +822,7 @@ export default function Explore({ location, data }) {
                   {!isLoading && (
                     <>
                       {!searchResults ||
-                        (searchResults.length === 0 && (
-                          <div className="container p2030 not-found-container">
-                            <div className="row">
-                              <div className="col-12 text-bold">
-                                We’re unable to find any parks that match your criteria
-                              </div>
-                              <div className="col-12 p20t">
-                                Your filtering options did not return any results.
-                                <br />
-                                Please try refining your inputs or parameters.
-                              </div>
-                            </div>
-                          </div>
-                        ))}
+                        (searchResults.length === 0 && (<NoSearchResults></NoSearchResults>) )}
                       {searchResults && searchResults.length > 0 && (
                         <>
                           {searchResults
