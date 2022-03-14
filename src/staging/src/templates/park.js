@@ -30,6 +30,7 @@ import { makeStyles } from "@material-ui/core/styles"
 import Header from "../components/header"
 import Footer from "../components/footer"
 import useScrollSpy from "react-use-scrollspy"
+import Heading from "../components/park/heading.js"
 
 import "../styles/parks.scss"
 
@@ -288,9 +289,10 @@ export default function ParkTemplate({ data }) {
                   </div>
                 )}
                 {menuItems[2].visible && (
-                  <div ref={advisoryRef} className="full-width">
+                  <div ref={advisoryRef} className="full-width anchor-link" id="park-advisory-details-container">
                     {isLoadingAdvisories && (
                       <div className="mb-5">
+                        <Heading>{`Advisories`}</Heading>
                         <div className="spinner-border" role="status">
                           <span className="sr-only">Loading...</span>
                         </div>
